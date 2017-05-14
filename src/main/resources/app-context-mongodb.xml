@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mongo="http://www.springframework.org/schema/data/mongo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/data/mongo
+       http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
+
+	<mongo:mongo-client id="mongoClient"
+		host="${dragonfruit.mongodb.host}" port="${dragonfruit.mongodb.port}"
+		credentials="${dragonfruit.mongodb.username}:${dragonfruit.mongodb.password}@${dragonfruit.mongodb.databaseName}">
+		<mongo:client-options
+			connections-per-host="${dragonfruit.mongodb.connectionsPerHost}"
+			min-connections-per-host="${dragonfruit.mongodb.minConnectionsPerHost}"
+			threads-allowed-to-block-for-connection-multiplier="${dragonfruit.mongodb.threadsAllowedToBlockForConnectionMultiplier}"
+			connect-timeout="${dragonfruit.mongodb.connectTimeout}"
+			max-wait-time="${dragonfruit.mongodb.maxWaitTime}"
+			socket-keep-alive="${dragonfruit.mongodb.socketKeepAlive}"
+			socket-timeout="${dragonfruit.mongodb.socketTimeout}" />
+	</mongo:mongo-client>
+
+	<mongo:db-factory id="mongoDbFactory"
+		dbname="${dragonfruit.mongodb.databaseName}" mongo-ref="mongoClient" />
+
+	<mongo:template id="mongoTemplate" db-factory-ref="mongoDbFactory"
+		write-concern="NORMAL" />
+
+	<mongo:repositories base-package="dragonfruit.server.dao" />
+</beans>

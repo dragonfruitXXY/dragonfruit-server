@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<contextName>${HOSTNAME}</contextName>
+	<appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>
+				%d{yyyy-MM-dd HH:mm:ss.SSS}|%level|%class|%thread|%method|%line|%msg%n
+			</pattern>
+		</encoder>
+	</appender>
+
+	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${logs.dir}/dragonfruitserver.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<FileNamePattern>${logs.dir}/dragonfruitserver.%i.log</FileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>1</maxIndex>
+		</rollingPolicy>
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>30MB</maxFileSize>
+		</triggeringPolicy>
+		<encoder>
+			<charset>UTF-8</charset>
+			<Pattern>
+				%d{yyyy-MM-dd HH:mm:ss.SSS}|%level|%class|%thread|%method|%line|%msg%n
+			</Pattern>
+		</encoder>
+	</appender>
+
+	<!-- all || debug,info,warn,error -->
+	<root>
+		<level value="WARN" />
+		<appender-ref ref="stdout" />
+		<appender-ref ref="file" />
+	</root>
+
+	<!-- specific -->
+	<logger name="dragonfruit.server" level="INFO"/>
+	<logger name="org.eclipse.jetty" level="ERROR"/>
+	<logger name="org.springframework" level="ERROR"/>
+
+</configuration>
