@@ -12,7 +12,7 @@ import dragonfruit.server.util.RandomUtils;
  */
 public class UserBindCache {
 	/**
-	 * 用户绑定状态缓存池，绑定之后生成随机字串用作tocken返回给客户端并存入该缓存池，用以之后接口进行比对等等
+	 * 用户登录状态缓存池，绑定之后生成随机字串用作tocken返回给客户端并存入该缓存池，用以之后接口进行比对等等
 	 * 
 	 * <pre>
 	 * 	缓存池结构：
@@ -25,7 +25,7 @@ public class UserBindCache {
 	public static Map<String, String> userTockenBindPool = new HashMap<>();
 
 	/**
-	 * 向缓存池添加绑定用户,若已绑定，则直接返回tocken
+	 * 向缓存池添加登录用户,若已绑定，则直接返回tocken
 	 * 
 	 * @param userId
 	 * @return tocken
@@ -44,7 +44,7 @@ public class UserBindCache {
 	/**
 	 * 获取tocken对应的userId
 	 * 
-	 * @param userId
+	 * @param tocken
 	 * @return
 	 */
 	public static String getBoundUser(String tocken) {
@@ -53,8 +53,7 @@ public class UserBindCache {
 
 	/**
 	 * 用户的tocken是否存在
-	 * 
-	 * @param userId
+	 *
 	 * @param tocken
 	 * @return
 	 */
@@ -65,9 +64,9 @@ public class UserBindCache {
 	}
 
 	/**
-	 * 删除绑定用户信息，即解绑
+	 * 删除登录用户信息，即登出
 	 * 
-	 * @param userId
+	 * @param tocken
 	 */
 	public static void removeBoundUserTocken(String tocken) {
 		if (userTockenBindPool.containsKey(tocken))
@@ -75,7 +74,7 @@ public class UserBindCache {
 	}
 
 	/**
-	 * 判断用户是否已经绑定
+	 * 判断用户是否已经登录
 	 * 
 	 * @param userId
 	 * @return
@@ -90,7 +89,7 @@ public class UserBindCache {
 	}
 
 	/**
-	 * 已绑定的用户获取缓存池中的tocken(用value获取key)
+	 * 已登录的用户获取缓存池中的tocken(用value获取key)
 	 * 
 	 * @param userId
 	 * @return

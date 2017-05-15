@@ -1,11 +1,12 @@
 package dragonfruit.server;
 
+import dragonfruit.server.common.StartupCheck;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
- * 程序入口，启动Spring对App上下文进行配置，利用Spring启动Jetty服务器
+ * 程序入口
  * 
  * Created by xuyh at 2017年2月28日 下午4:02:47
  *
@@ -100,6 +101,7 @@ public class Main {
 				applicationContext = new ClassPathXmlApplicationContext(contextFilePath);
 				applicationContext.registerShutdownHook();
 				hasStarted = true;
+				StartupCheck.getInstance().initializeCheck();
 			} catch (Exception e) {
 				logger.warn(String.format("Spring initialize Exception! [%s]", e.getMessage()));
 			}

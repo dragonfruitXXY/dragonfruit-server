@@ -11,14 +11,15 @@ public class UserVO {
 	private String password;// 密码
 	private String phoneNum;// 电话
 	private String email;
+	private String signature;//个性签名
 
-	public UserVO(String id, String name, String password, String phoneNum, String email) {
-		super();
+	public UserVO(String id, String name, String password, String phoneNum, String email, String signature) {
 		this.id = id;
 		this.name = name;
 		this.password = password;
 		this.phoneNum = phoneNum;
 		this.email = email;
+		this.signature = signature;
 	}
 
 	public String getId() {
@@ -59,5 +60,13 @@ public class UserVO {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getSignature() {
+		return signature;
+	}
+
+	public void setSignature(String signature) {
+		this.signature = signature;
 	}
 }

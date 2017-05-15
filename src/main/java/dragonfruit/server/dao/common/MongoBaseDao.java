@@ -13,13 +13,6 @@ import java.util.List;
 public interface MongoBaseDao<T> {
 	/**
 	 * 保存对象
-	 * <p>
-	 * 需要说明的是，Mongdo自身没有主键自增机制，解决方法：
-	 * <ol>
-	 * <li>实体入库的时候，程序中为实体赋主键值.
-	 * <li>实体入库的时候，在mongoDB中自定义函数实现主键自增机制，定义方法同js代码类似
-	 * </ol>
-	 * </p>
 	 *
 	 * @param t
 	 * @return
@@ -34,23 +27,16 @@ public interface MongoBaseDao<T> {
 	/**
 	 * 根据Id从Collection中查询对象。
 	 *
-	 * @param id 实体对象的Id,对应Collection中记录的_id字段.
-	 *          <p>
-	 *          需要说明的是，Mongdo自身没有主键自增机制，解决方法：
-	 *          <ol>
-	 *          <li>实体入库的时候，程序中为实体赋主键值.
-	 *          <li>实体入库的时候，在mongoDB中自定义函数实现主键自增机制，定义方法同js代码类似
-	 *          </ol>
-	 *          </p>
-	 * @return 实体对象
+	 * @param id 
+	 * @return
 	 */
 	T getById(String id);
 
 	/**
 	 * 根据条件查询集合
 	 *
-	 * @param query 查询条件
-	 * @return 满足条件的集合
+	 * @param query
+	 * @return
 	 */
 	List<T> getList(Query query);
 
@@ -65,18 +51,18 @@ public interface MongoBaseDao<T> {
 	/**
 	 * 通过条件进行分页查询
 	 *
-	 * @param query 查询条件
-	 * @param start 查询起始值 <strong> 类似mysql查询中的 limit start, size 中的 start</strong>
-	 * @param size 查询大小 <strong> 类似mysql查询中的 limit start, size 中的 size</strong>
-	 * @return 满足条件的集合
+	 * @param query
+	 * @param start
+	 * @param size
+	 * @return
 	 */
 	List<T> getPage(Query query, int start, int size);
 
 	/**
-	 * 根据条件查询库中符合记录的总数,为分页查询服务
+	 * 根据条件查询库中符合记录的总数
 	 *
-	 * @param query 查询条件
-	 * @return 满足条件的记录总数
+	 * @param query
+	 * @return
 	 */
 	Long getCount(Query query);
 

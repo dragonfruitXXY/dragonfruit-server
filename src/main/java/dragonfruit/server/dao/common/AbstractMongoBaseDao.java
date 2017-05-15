@@ -105,11 +105,10 @@ public abstract class AbstractMongoBaseDao<T> implements MongoBaseDao<T> {
 	}
 
 	/**
-	 * 模板方法，由子类实现返回反射对象的类型。 实现示例：子类继承本抽象类，重写本方法并在方法体中返回子类的class
 	 * 
 	 * <pre>
-	 * protected Class<CIDailyStatistic> getEntityClass() { 
-	 * 		return CIDailyStatistic.class; 
+	 * protected Class<Student> getEntityClass() { 
+	 *   return Student.class; 
 	 * }
 	 * 
 	 * <pre/>

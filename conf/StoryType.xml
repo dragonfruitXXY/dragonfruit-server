@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StoryTypes>
+	<StoryType code="science" name="科学" />
+	<StoryType code="medical" name="医学" />
+	<StoryType code="military" name="军事" />
+	<StoryType code="food" name="食物" />
+	<StoryType code="funny" name="搞笑" />
+</StoryTypes>

@@ -14,7 +14,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.XmlWebApplicationContext;
 
 /**
- * 通过Spring启动Jetty服务器的类，实现
+ * 启动Jetty服务器类
  * 
  * Created by Xuyh at 2017年3月1日 下午11:44:06.
  */
@@ -36,7 +36,6 @@ public class JettyStartUp implements ApplicationContextAware {
 
 	public void start() throws Exception {
 		InetSocketAddress address = new InetSocketAddress(host, Integer.parseInt(port));
-		// 新建web server
 		server = new Server(address);
 		WebAppContext webAppContext = new WebAppContext();
 		webAppContext.setContextPath("/");

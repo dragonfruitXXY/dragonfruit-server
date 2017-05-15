@@ -23,13 +23,13 @@ import dragonfruit.server.service.cache.UserBindCache;
 import dragonfruit.server.util.JsonUtils;
 
 /**
- * 面向移动客户端的rest service
+ *
  * 
  * Created by Xuyh at 2017年3月22日 下午8:23:24.
  */
-@Path("/client")
-public class ClientService {
-	private Logger logger = LoggerFactory.getLogger(ClientService.class);
+@Path("/user")
+public class UserService {
+	private Logger logger = LoggerFactory.getLogger(UserService.class);
 
 	private UserLogic getUserLogic() {
 		return (UserLogic) Main.getBean("userLogic");
@@ -40,7 +40,7 @@ public class ClientService {
 	 * 添加,修改用户信息
 	 * 
 	 * <pre>
-	 * 	如果添加成功即认为绑定用户成功，将用户信息返回给客户端
+	 * 	如果添加成功即认为用户登录成功，将用户信息返回给客户端
 	 * 
 	 * 	返回参数：
 	 * 	{"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
@@ -51,7 +51,7 @@ public class ClientService {
 	 * @return
 	 */
 	@POST
-	@Path("/user")
+	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String addUser(String json) {
@@ -76,7 +76,7 @@ public class ClientService {
 	}
 
 	/**
-	 * 绑定用户,可以理解为登录,成功之后返回用户详情,供客户端使用
+	 * 用户登录,成功之后返回用户详情,供客户端使用
 	 * 
 	 * <pre>
 	 * 	请求参数：
@@ -92,7 +92,7 @@ public class ClientService {
 	 * @return
 	 */
 	@POST
-	@Path("/user/bind")
+	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String bindUser(String json) {
@@ -122,17 +122,17 @@ public class ClientService {
 	}
 
 	/**
-	 * 解绑用户(登出)
+	 * 用户登出
 	 * 
 	 * <pre>
 	 * 需要在Cookie中设置tocken
 	 * </pre>
 	 * 
-	 * @param json
+	 * @param tocken
 	 * @return
 	 */
 	@GET
-	@Path("/user/unbind")
+	@Path("/logout")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String unbindUser(@CookieParam("tocken") String tocken) {
@@ -140,10 +140,10 @@ public class ClientService {
 		if (userId != null) {
 			UserBindCache.removeBoundUserTocken(tocken);
 			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapSuccessResult(String.format("Unbind user [%s] succeeded!", userId)));
+					.objectToJsonStr(ResultMessage.wrapSuccessResult(String.format("User [%s] logout succeeded!", userId)));
 		} else {
 			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult(String.format("Unbind user [%s] failed!", userId)));
+					.objectToJsonStr(ResultMessage.wrapFailureResult(String.format("User [%s] logout failed!", userId)));
 		}
 	}
 
@@ -154,7 +154,7 @@ public class ClientService {
 	 * @return
 	 */
 	@GET
-	@Path("/user/delete")
+	@Path("/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String deleteUser(@CookieParam("tocken") String tocken) {
@@ -182,17 +182,17 @@ public class ClientService {
 	 * 需要在Cookie中设置tocken
 	 * </pre>
 	 * 
-	 * @param userId
+	 * @param tocken
 	 * @return
 	 */
 	@GET
-	@Path("/user/info")
+	@Path("/info")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getUserInfo(@CookieParam("tocken") String tocken) {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user bound!"));
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
 		User user = null;
 		try {
 			user = getUserLogic().getById(userId);
@@ -202,7 +202,8 @@ public class ClientService {
 		}
 		if (user == null)
 			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Not user match for tocken!"));
-		UserVO userVO = new UserVO(user.getId(), user.getName(), user.getPassword(), user.getPhoneNum(), user.getEmail());
+		UserVO userVO = new UserVO(user.getId(), user.getName(), user.getPassword(), user.getPhoneNum(), user.getEmail(),
+				user.getSignature());
 		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(userVO, "Get user info succeeded!"));
 	}
 }

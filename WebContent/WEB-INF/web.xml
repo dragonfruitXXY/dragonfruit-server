@@ -8,7 +8,11 @@
 	<!-- 这里配置resteasy扫描到的rest接口，注意需要是java class，不能是java interface，不同接口以英文逗号分隔 -->
 	<context-param>
 		<param-name>resteasy.resources</param-name>
-		<param-value>dragonfruit.server.service.BaseService,dragonfruit.server.service.ClientService</param-value>
+		<param-value>
+			dragonfruit.server.service.BaseService,
+			dragonfruit.server.service.UserService,
+			dragonfruit.server.service.StoryService
+		</param-value>
 	</context-param>
 
 	<!-- 这里配置resteasy -->
