@@ -68,6 +68,8 @@ public class StoryDaoImpl extends AbstractMongoBaseDao<Story> implements StoryDa
 		Story dbStory = getById(id);
 		if (dbStory == null)
 			return false;
+		if (dbStory.getLike() == 0L)
+			return true;
 		dbStory.setLike(dbStory.getLike() - 1);
 		save(dbStory);
 		return true;

@@ -66,6 +66,8 @@ public class StoryContentDaoImpl extends AbstractMongoBaseDao<StoryContent> impl
 		StoryContent dbStoryContent = getById(id);
 		if (dbStoryContent == null)
 			return false;
+		if (dbStoryContent.getLike() == 0L)
+			return true;
 		dbStoryContent.setLike(dbStoryContent.getLike() - 1);
 		save(dbStoryContent);
 		return true;

@@ -26,7 +26,7 @@ public class Story {
 	private String storyTypeId;//故事类型id
 	private String name;//故事名称
 	private String description;//故事描述
-	private Long like;//故事点赞数
+	private Long like = 0l;//故事点赞数(默认为零)
 
 	public String getId() {
 		return id;

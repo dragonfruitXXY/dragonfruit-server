@@ -27,7 +27,7 @@ public class StoryContent {
 	@Indexed
 	private String headContentId = null;//上一个内容id(null表示是故事的起始内容)
 	private String content;//具体内容文本
-	private Long like;//内容点赞数
+	private Long like = 0L;//内容点赞数
 
 	public String getId() {
 		return id;

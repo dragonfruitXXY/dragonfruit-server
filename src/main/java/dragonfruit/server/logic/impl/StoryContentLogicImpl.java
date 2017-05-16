@@ -24,9 +24,10 @@ public class StoryContentLogicImpl implements StoryContentLogic {
 		if (storyContent.getHeadContentId() == null) {//保存为故事头内容
 			if (getHeadContent(storyContent.getStoryId()) != null)//若已经存在头内容,则不予保存
 				return null;
+		} else {
+			if (getById(storyContent.getHeadContentId()) == null)//若不存在父内容
+				return null;
 		}
-		if (getById(storyContent.getHeadContentId()) == null)//若不存在父内容
-			return null;
 		storyContentDao.save(storyContent);
 		return storyContent.getId();
 	}

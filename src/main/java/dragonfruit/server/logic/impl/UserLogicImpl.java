@@ -30,7 +30,7 @@ public class UserLogicImpl implements UserLogic {
 	}
 
 	public void delete(User user) {
-		userDao.delete(user);
+		userDao.deleteById(user.getId());
 	}
 
 	public void deleteById(String id) {
