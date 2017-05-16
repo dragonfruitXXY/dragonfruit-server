@@ -27,4 +27,25 @@
 		<servlet-name>rest-easy</servlet-name>
 		<url-pattern>/dragonfruit/rest/v1/*</url-pattern>
 	</servlet-mapping>
+	<!--JQuery 跨域访问限制解除filter -->
+	<filter>
+		<filter-name>cross-origin</filter-name>
+		<filter-class>org.eclipse.jetty.servlets.CrossOriginFilter</filter-class>
+		<init-param>
+			<param-name>allowedOrigins</param-name>
+			<param-value>*</param-value>
+		</init-param>
+		<init-param>
+			<param-name>allowedMethods</param-name>
+			<param-value>GET,POST</param-value>
+		</init-param>
+		<init-param>
+			<param-name>allowCredentials</param-name>
+			<param-value>true</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>cross-origin</filter-name>
+		<url-pattern>/dragonfruit/rest/v1/*</url-pattern>
+	</filter-mapping>
 </web-app>
