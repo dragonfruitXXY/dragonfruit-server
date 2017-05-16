@@ -126,7 +126,7 @@ public class StoryService {
 	 * 新建内容
 	 *
 	 * <pre>
-	 *     请求数据格式:{"storyId":"", "headContentId":"", ""content:""}
+	 *     请求数据格式:{"storyId":"", "headContentId":"", "content":""}
 	 *     返回数据格式:{"result":"true/false", "message":"", "data":{"storyContentId":""}}
 	 *     需要在Cookie中设置tocken
 	 * </pre>
@@ -153,7 +153,7 @@ public class StoryService {
 		String storyContentId = null;
 		if (storyContent != null) {
 			storyContent.setUserId(userId);
-			getStoryContentLogic().save(storyContent);
+			storyContentId = getStoryContentLogic().save(storyContent);
 		}
 		Map<String, String> data = new HashMap<>();
 		data.put("storyContentId", storyContentId);
@@ -288,6 +288,29 @@ public class StoryService {
 		Map<String, Object> data = new HashMap<>();
 		data.put("storyCount", count);
 		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Query succeeded!"));
+	}
+
+	/**
+	 * 获取用户建立的所有故事
+	 * 
+	 * @param tocken
+	 * @return
+	 */
+	@GET
+	@Path("/getStories")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getUserStories(@CookieParam("tocken") String tocken) {
+		String userId = UserBindCache.getBoundUser(tocken);
+		if (userId == null)
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
+		List<Story> storyList = getStoryLogic().getByUserId(userId);
+		List<StoryVO> storyVOs = new ArrayList<>();
+		for (Story story : storyList) {
+			storyVOs.add(new StoryVO(story.getId(), story.getUserId(), story.getStoryTypeId(), story.getName(),
+					story.getDescription(), story.getLike()));
+		}
+		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(storyVOs, "Query succeeded!"));
 	}
 
 	/**
@@ -434,7 +457,7 @@ public class StoryService {
 	 * @return
 	 */
 	@GET
-	@Path("/content/{storyId}/tree")
+	@Path("/{storyId}/content/tree")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String getStoryContentTree(@PathParam("storyId") String storyId) {

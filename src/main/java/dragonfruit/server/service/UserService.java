@@ -80,7 +80,7 @@ public class UserService {
 	 * 
 	 * <pre>
 	 * 	请求参数：
-	 * 	{"userName":"", "userPwd":""}
+	 * 	{"name":"", "password":""}
 	 * 
 	 * 	返回参数：
 	 * 	{"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}

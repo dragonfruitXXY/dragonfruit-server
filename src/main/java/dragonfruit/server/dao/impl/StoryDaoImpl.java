@@ -22,7 +22,7 @@ public class StoryDaoImpl extends AbstractMongoBaseDao<Story> implements StoryDa
 
 	public List<Story> getPageByPageSize(int page, int size) {
 		Query query = new Query();
-		int start = page * size + 1;
+		int start = page * size;
 		return getPage(query, start, size);
 	}
 
@@ -30,7 +30,7 @@ public class StoryDaoImpl extends AbstractMongoBaseDao<Story> implements StoryDa
 		Query query = new Query();
 		Sort sort = new Sort(Sort.Direction.DESC, Story.FIELD_CODE_LIKE);
 		query.with(sort);
-		int start = page * size + 1;
+		int start = page * size;
 		return getPage(query, start, size);
 	}
 
