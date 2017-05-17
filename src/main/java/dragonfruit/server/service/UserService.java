@@ -8,6 +8,7 @@ import javax.ws.rs.CookieParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -36,8 +37,31 @@ public class UserService {
 	}
 
 	/**
+	 * 查询用户名是否已经存在
+	 * 
+	 * @param userName
+	 * @return
+	 */
+	@GET
+	@Path("/{userName}/exists")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String userNameExists(@PathParam("userName") String userName) {
+		if (userName == null || userName.equals(""))
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Path param userName can not be null!"));
+		Map<String, Object> data = new HashMap<>();
+		if (getUserLogic().getByName(userName) == null) {//用户名不存在
+			data.put("exist", false);
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Query succeeded!"));
+		} else {
+			data.put("exist", true);
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Query succeeded!"));
+		}
+	}
+
+	/**
 	 *
-	 * 添加,修改用户信息
+	 * 添加
 	 * 
 	 * <pre>
 	 * 	如果添加成功即认为用户登录成功，将用户信息返回给客户端
@@ -73,6 +97,38 @@ public class UserService {
 		} else {
 			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Save user failed!"));
 		}
+	}
+
+	/**
+	 * 修改用户信息
+	 * 
+	 * <pre>
+	 * 	请求格式:{"name":"", "password":"", "phoneNum":"", "email":"", "signature":"", "nickName":""}
+	 * </pre>
+	 * 
+	 * @param tocken
+	 * @param json
+	 * @return
+	 */
+	@POST
+	@Path("/update")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String updateUser(@CookieParam("tocken") String tocken, String json) {
+		String userId = UserBindCache.getBoundUser(tocken);
+		if (userId == null)
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
+		User user = null;
+		try {
+			user = (User) JsonUtils.JsonToObj(json, User.class);
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
+		}
+		user.setId(userId);
+		if (!getUserLogic().updateUser(user))
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Update user failed!"));
+		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Update user succeeded!"));
 	}
 
 	/**
@@ -203,7 +259,7 @@ public class UserService {
 		if (user == null)
 			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Not user match for tocken!"));
 		UserVO userVO = new UserVO(user.getId(), user.getName(), user.getPassword(), user.getPhoneNum(), user.getEmail(),
-				user.getSignature());
+				user.getSignature(), user.getNickName());
 		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(userVO, "Get user info succeeded!"));
 	}
 }

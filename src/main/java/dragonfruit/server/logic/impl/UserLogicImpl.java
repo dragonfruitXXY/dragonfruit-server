@@ -46,4 +46,13 @@ public class UserLogicImpl implements UserLogic {
 		User user = userDao.getByName(name);
 		return user;
 	}
+
+	public boolean updateUser(User user) {
+		if (user == null)
+			return false;
+		if (user.getId() == null || user.getId().equals(""))
+			return false;
+		userDao.save(user);
+		return true;
+	}
 }

@@ -18,6 +18,7 @@ public class User {
 	public static String FIELD_CODE_PHONE_NUM = "phoneNum";
 	public static String FIELD_CODE_EMAIL = "email";
 	public static String FIELD_CODE_SUGNATURE = "signature";
+	public static String FIELD_CODE_NICK_NAME = "nickName";
 
 	@Id
 	private String id;
@@ -27,6 +28,7 @@ public class User {
 	private String phoneNum;// 电话
 	private String email;// 电子邮件
 	private String signature;//个性签名
+	private String nickName;//用户昵称
 
 	public String getName() {
 		return name;
@@ -74,6 +76,14 @@ public class User {
 
 	public void setSignature(String signature) {
 		this.signature = signature;
+	}
+
+	public String getNickName() {
+		return nickName;
+	}
+
+	public void setNickName(String nickName) {
+		this.nickName = nickName;
 	}
 
 }

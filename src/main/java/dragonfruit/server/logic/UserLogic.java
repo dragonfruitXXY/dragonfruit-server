@@ -17,6 +17,14 @@ public interface UserLogic {
 	String save(User user);
 
 	/**
+	 * 修改用户信息
+	 * 
+	 * @param user
+	 * @return
+	 */
+	boolean updateUser(User user);
+
+	/**
 	 * 删除用户
 	 * 
 	 * @param user
