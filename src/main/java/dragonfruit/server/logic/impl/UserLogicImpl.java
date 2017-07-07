@@ -41,7 +41,7 @@ public class UserLogicImpl implements UserLogic {
 	}
 
 	public boolean registerByEmailVerification(User user) {
-		// TODO: 2017/7/7 test
+		// TODO: 2017/7/7 邮件信息国际化
 		if (user == null)
 			return false;
 		if (user.getName() == null)
@@ -93,8 +93,10 @@ public class UserLogicImpl implements UserLogic {
 						"\t\t</pre>\n" +
 						"\t</body>\n" +
 						"</html>", userRegister.getVerificationCode(),
-						String.format(AppProperties.getProperty("dragonfruit.mail.verify.baseUrl"), userRegister.getName(),
-						userRegister.getVerificationCode())));
+						String.format(AppProperties.getProperty("dragonfruit.mail.verify.url"),
+								AppProperties.getProperty("dragonfruit.server.host"),
+								AppProperties.getProperty("dragonfruit.server.port"), userRegister.getName(),
+								userRegister.getVerificationCode())));
 		try {
 			EmailUtils.sendTextEmail(emailCredential, message);
 			// TODO: 2017/7/7 这里逻辑还需要斟酌一下 ，是否需要邮件验证添加一个接口
@@ -113,9 +115,10 @@ public class UserLogicImpl implements UserLogic {
 	}
 
 	public String registerVerify(String userName, String verificationCode) {
-		// TODO: 2017/7/7 test
 		if (UserRegisterCache.verify(userName, verificationCode)) {//验证成功,用户存库，返回数据库ID
 			UserRegister userRegister = UserRegisterCache.getUserRegisterCache(userName);
+			if (userRegister == null)
+				return null;
 			User user = new User();
 			user.setName(userRegister.getName());
 			user.setNickName(userRegister.getNickName());

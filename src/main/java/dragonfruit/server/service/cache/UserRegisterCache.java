@@ -67,7 +67,7 @@ public class UserRegisterCache {
 	 * @param userName
 	 * @return
 	 */
-	public static UserRegister getUserRegisterCache(String userName) {
+	public static synchronized UserRegister getUserRegisterCache(String userName) {
 		return userRegisterCache.get(userName);
 	}
 
@@ -92,9 +92,8 @@ public class UserRegisterCache {
 	   *     扫描缓存中的数据判断是否超过30min,超过执行清理,注册验证成功的一并清理
 	   * </pre>
 	 */
-	@Scheduled(cron = "* 0/1 * * * *")
+	@Scheduled(cron = "0 0/1 * * * *")
 	public void clearCache() {
-		// TODO: 2017/7/7  测试
 		for (String userName : userRegisterCache.keySet()) {
 			UserRegister userRegister = userRegisterCache.get(userName);
 			//经过验证

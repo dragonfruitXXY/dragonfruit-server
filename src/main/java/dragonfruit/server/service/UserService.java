@@ -19,8 +19,6 @@ import dragonfruit.server.service.cache.UserBindCache;
 import dragonfruit.server.util.JsonUtils;
 
 /**
- *
- * 
  * Created by Xuyh at 2017年3月22日 下午8:23:24.
  */
 @Path("/user")
@@ -33,7 +31,7 @@ public class UserService {
 
 	/**
 	 * 查询用户名是否已经存在
-	 * 
+	 *
 	 * @param userName
 	 * @return
 	 */
@@ -42,7 +40,6 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String userNameExists(@PathParam("userName") String userName) {
-		// TODO: 2017/7/7 测试
 		if (userName == null || userName.equals(""))
 			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Path param userName can not be null!"));
 		Map<String, Object> data = new HashMap<>();
@@ -68,14 +65,13 @@ public class UserService {
 	}
 
 	/**
-	 *
 	 * 用户注册（未验证）
-	 *
+	 * <p>
 	 * <pre>
 	 *     验证方式可选（待完成）需要添加参数选择验证方式
-	 *     
+	 *
 	 * 	返回成功即用户注册信息保存到缓存中成功
-	 * 
+	 *
 	 * 	返回参数：{"result":true/false, "message":"", "data":}
 	 *
 	 * </pre>
@@ -104,13 +100,13 @@ public class UserService {
 	}
 
 	/**
-	 * 用户注册验证
-	 *
+	 * 用户注册验证(GET), 邮箱点击，返回HTML页面
+	 * <p>
 	 * <pre>
 	 *     请求格式:/user/register/{userName}/verify?verificationCode=
 	 *
 	 *     返回参数：如果验证成功返回用户id和tocken
-	 * 		{"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
+	 *        {"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
 	 *
 	 * 		之后的请求需要在cookie中设置tocken
 	 * </pre>
@@ -122,7 +118,7 @@ public class UserService {
 	@GET
 	@Path("/register/{userName}/verify")
 	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.TEXT_HTML + "; charset=utf-8")
 	public String verifyRegister(@PathParam("userName") String userName,
 			@QueryParam("verificationCode") String verificationCode) {
 		if (userName == null || userName.equals(""))
@@ -130,6 +126,53 @@ public class UserService {
 		if (verificationCode == null || verificationCode.equals(""))
 			return JsonUtils
 					.objectToJsonStr(ResultMessage.wrapFailureResult("Query param verificationCode can not be null!"));
+		String userId;
+		try {
+			userId = getUserLogic().registerVerify(userName, verificationCode);
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
+		}
+		if (userId != null) {//验证成功
+			String tocken = UserBindCache.addBoundUser(userId);
+			Map<String, String> data = new HashMap<>();
+			data.put("userId", userId);
+			data.put("tocken", tocken);
+			return String.format(
+					"<html><head><title>用户注册验证成功</title></head><body><pre>你好, %s !你已验证注册成功。请重新登录。</pre></body></html>", userName);
+		} else {
+			return "<html><head><title>用户注册验证成功</title></head><body><pre>验证注册失败。请重新注册。</pre></body></html>";
+		}
+	}
+
+	/**
+	 * 用户注册验证(POST),返回前端需要的数据
+	 * <p>
+	 * <pre>
+	 *     请求格式:{"userName":"", "verificationCode":""}
+	 *
+	 *     返回参数：如果验证成功返回用户id和tocken
+	 *        {"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
+	 *
+	 * 		之后的请求需要在cookie中设置tocken
+	 * </pre>
+	 *
+	 * @param userName
+	 * @param verificationCode
+	 * @return
+	 */
+	@POST
+	@Path("/register/verify")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String verifyRegisterByPost(String json) {
+		if (json == null || json.equals(""))
+			return JsonUtils
+					.objectToJsonStr(ResultMessage.wrapFailureResult("Param can not be null!"));
+		@SuppressWarnings("unchecked")
+		Map<String, String> verifyInfos = JsonUtils.stringToMap(json);
+		String userName = verifyInfos.get("userName");
+		String verificationCode = verifyInfos.get("verificationCode");
 		String userId;
 		try {
 			userId = getUserLogic().registerVerify(userName, verificationCode);
@@ -150,11 +193,11 @@ public class UserService {
 
 	/**
 	 * 修改用户信息
-	 * 
+	 * <p>
 	 * <pre>
 	 * 	请求格式:{"name":"", "password":"", "phoneNum":"", "email":"", "signature":"", "nickName":""}
 	 * </pre>
-	 * 
+	 *
 	 * @param tocken
 	 * @param json
 	 * @return
@@ -182,17 +225,17 @@ public class UserService {
 
 	/**
 	 * 用户登录,成功之后返回用户详情,供客户端使用
-	 * 
+	 * <p>
 	 * <pre>
 	 * 	请求参数：
-	 * 	{"name":"", "password":""}
-	 * 
+	 *    {"name":"", "password":""}
+	 *
 	 * 	返回参数：
-	 * 	{"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
-	 * 
+	 *    {"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
+	 *
 	 * 	之后的请求需要在cookie中设置tocken
 	 * </pre>
-	 * 
+	 *
 	 * @param json
 	 * @return
 	 */
@@ -228,11 +271,11 @@ public class UserService {
 
 	/**
 	 * 用户登出
-	 * 
+	 * <p>
 	 * <pre>
 	 * 需要在Cookie中设置tocken
 	 * </pre>
-	 * 
+	 *
 	 * @param tocken
 	 * @return
 	 */
@@ -254,7 +297,7 @@ public class UserService {
 
 	/**
 	 * 注销(删除)用户
-	 * 
+	 *
 	 * @param tocken
 	 * @return
 	 */
@@ -282,11 +325,11 @@ public class UserService {
 
 	/**
 	 * 获取用户详情
-	 * 
+	 * <p>
 	 * <pre>
 	 * 需要在Cookie中设置tocken
 	 * </pre>
-	 * 
+	 *
 	 * @param tocken
 	 * @return
 	 */
