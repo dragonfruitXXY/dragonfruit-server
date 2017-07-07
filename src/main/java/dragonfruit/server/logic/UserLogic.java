@@ -9,6 +9,34 @@ import dragonfruit.server.entity.User;
  *
  */
 public interface UserLogic {
+	String VERIFY_BY_EMAIL = "register.email";
+	String VERIFY_BY_TEXT_MESSAGE = "register.text.message";
+
+	/**
+	 * 用户注册(添加缓存)
+	 *
+	 * <pre>
+	 * 		用户注册将信息添加至注册缓存中，待验证成功后存库(异步)    
+	 * </pre>
+	 * 
+	 * @param user
+	 * @return
+	 */
+	boolean register(User user, String verifyBy);
+
+	/**
+	 * 用户注册验证
+	 * 
+	 * <pre>
+	 *     验证成功则添加用户到数据库
+	 * </pre>
+	 * 
+	 * @param userName 用户名
+	 * @param verificationCode 验证码
+	 * @return 验证成功返回用户ID(数据库ID)
+	 */
+	String registerVerify(String userName, String verificationCode);
+
 	/**
 	 * 保存用户
 	 * 

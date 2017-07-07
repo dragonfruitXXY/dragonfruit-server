@@ -3,15 +3,10 @@ package dragonfruit.server.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
+import dragonfruit.server.service.cache.UserRegisterCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,10 +42,11 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public String userNameExists(@PathParam("userName") String userName) {
+		// TODO: 2017/7/7 测试
 		if (userName == null || userName.equals(""))
 			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Path param userName can not be null!"));
 		Map<String, Object> data = new HashMap<>();
-		if (getUserLogic().getByName(userName) == null) {//用户名不存在
+		if (!isUserNameExists(userName)) {//用户名不存在
 			data.put("exist", false);
 			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Query succeeded!"));
 		} else {
@@ -60,16 +56,28 @@ public class UserService {
 	}
 
 	/**
+	 * 判断用户名是否存在
 	 *
-	 * 添加
-	 * 
+	 * @param userName
+	 * @return
+	 */
+	private boolean isUserNameExists(String userName) {
+		if (!UserRegisterCache.isCacheUserNameExists(userName) && getUserLogic().getByName(userName) == null)//不存在
+			return false;
+		return true;
+	}
+
+	/**
+	 *
+	 * 用户注册（未验证）
+	 *
 	 * <pre>
-	 * 	如果添加成功即认为用户登录成功，将用户信息返回给客户端
+	 *     验证方式可选（待完成）需要添加参数选择验证方式
+	 *     
+	 * 	返回成功即用户注册信息保存到缓存中成功
 	 * 
-	 * 	返回参数：
-	 * 	{"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
-	 * 	
-	 * 	之后的请求需要在cookie中设置tocken
+	 * 	返回参数：{"result":true/false, "message":"", "data":}
+	 *
 	 * </pre>
 	 *
 	 * @return
@@ -78,12 +86,53 @@ public class UserService {
 	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String addUser(String json) {
-		User user = null;
-		String userId = "";
+	public String registerUser(String json /*, String verifyBy*/) {
+		User user;
 		try {
 			user = (User) JsonUtils.JsonToObj(json, User.class);
-			userId = getUserLogic().save(user);
+			if (isUserNameExists(user.getName()))
+				return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("User name already exists!"));
+			if (getUserLogic().register(user, UserLogic.VERIFY_BY_EMAIL)) {
+				return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Register cache save succeeded!"));
+			} else {
+				return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Register cache save failed!"));
+			}
+		} catch (Exception e) {
+			logger.warn(e.getMessage());
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
+		}
+	}
+
+	/**
+	 * 用户注册验证
+	 *
+	 * <pre>
+	 *     请求格式:/user/register/{userName}/verify?verificationCode=
+	 *
+	 *     返回参数：如果验证成功返回用户id和tocken
+	 * 		{"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
+	 *
+	 * 		之后的请求需要在cookie中设置tocken
+	 * </pre>
+	 *
+	 * @param userName
+	 * @param verificationCode
+	 * @return
+	 */
+	@GET
+	@Path("/register/{userName}/verify")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String verifyRegister(@PathParam("userName") String userName,
+			@QueryParam("verificationCode") String verificationCode) {
+		if (userName == null || userName.equals(""))
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Path param userName can not be null!"));
+		if (verificationCode == null || verificationCode.equals(""))
+			return JsonUtils
+					.objectToJsonStr(ResultMessage.wrapFailureResult("Query param verificationCode can not be null!"));
+		String userId;
+		try {
+			userId = getUserLogic().registerVerify(userName, verificationCode);
 		} catch (Exception e) {
 			logger.warn(e.getMessage());
 			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
@@ -93,9 +142,9 @@ public class UserService {
 			Map<String, String> data = new HashMap<>();
 			data.put("userId", userId);
 			data.put("tocken", tocken);
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Save user succeeded!"));
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Verify user succeeded!"));
 		} else {
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Save user failed!"));
+			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Verify user failed!"));
 		}
 	}
 

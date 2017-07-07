@@ -14,6 +14,13 @@
 	</dependencySets>
 	<fileSets>
 		<fileSet>
+			<directory>/src/main/lib</directory>
+			<outputDirectory>lib</outputDirectory>
+			<excludes>
+				<exclude>*sources*</exclude>
+			</excludes>
+		</fileSet>
+		<fileSet>
 			<directory>/src/main/bin</directory>
 			<outputDirectory>/</outputDirectory>
 			<fileMode>0766</fileMode>
