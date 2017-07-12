@@ -1,54 +1,61 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:task="http://www.springframework.org/schema/task"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:task="http://www.springframework.org/schema/task"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
          http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
          http://www.springframework.org/schema/context
          http://www.springframework.org/schema/context/spring-context-4.0.xsd
          http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-4.0.xsd"
-       default-lazy-init="false">
+	default-lazy-init="false">
 
-    <!-- Spring读取properties配置文件的bean，设置配置文件路径，为XML中引用的变量赋值 -->
-    <bean id="propertyConfigurer"
-          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="locations">
-            <list>
-                <value>file:${user.dir}/conf/AppConfig.properties</value>
-            </list>
-        </property>
-    </bean>
+	<!-- Spring读取properties配置文件的bean，设置配置文件路径，为XML中引用的变量赋值 -->
+	<bean id="propertyConfigurer"
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>file:${user.dir}/conf/AppConfig.properties</value>
+			</list>
+		</property>
+	</bean>
 
-    <!-- Spring初始化bean时候将变量值进行类型转化的bean，配置了将String转化为int,以及将String转化为boolean的适配器 -->
-    <bean id="customEditorConfigurer"
-          class="org.springframework.beans.factory.config.CustomEditorConfigurer">
-        <property name="customEditors">
-            <map>
-                <entry key="int"
-                       value="dragonfruit.server.common.spring.property.IntegerPropertyEditor"/>
-                <entry key="boolean"
-                       value="dragonfruit.server.common.spring.property.BooleanPropertyEditor"/>
-            </map>
-        </property>
-    </bean>
+	<!-- Spring初始化bean时候将变量值进行类型转化的bean，配置了将String转化为int,以及将String转化为boolean的适配器 -->
+	<bean id="customEditorConfigurer"
+		class="org.springframework.beans.factory.config.CustomEditorConfigurer">
+		<property name="customEditors">
+			<map>
+				<entry key="int"
+					value="dragonfruit.server.common.spring.property.IntegerPropertyEditor" />
+				<entry key="boolean"
+					value="dragonfruit.server.common.spring.property.BooleanPropertyEditor" />
+			</map>
+		</property>
+	</bean>
 
-    <!-- 配置启动Jetty容器的Bean -->
-    <bean id="jettyStartUp" class="dragonfruit.server.common.JettyStartUp"
-          init-method="start">
-        <constructor-arg name="host" type="java.lang.String"
-                         value="${dragonfruit.server.host}"/>
-        <constructor-arg name="port" type="java.lang.String"
-                         value="${dragonfruit.server.port}"/>
-    </bean>
+	<bean id="i18nInit" class="xuyihao.i18n.I18nInit" init-method="init">
+		<constructor-arg name="defaultLanguage" type="java.lang.String"
+			value="${dragonfruit.i18n.default.language}" />
+		<constructor-arg name="languageResourceFilePath" type="java.lang.String"
+			value="${dragonfruit.i18n.resource.file.path}" />
+	</bean>
 
-    <!-- base configurations and component scan -->
-    <!-- 通过这些配置就不需要对DAO，Logic等层的bean进行配置文件编写bean了 -->
-    <context:annotation-config/>
-    <context:component-scan base-package="dragonfruit.server"/>
+	<!-- 配置启动Jetty容器的Bean -->
+	<bean id="jettyStartUp" class="dragonfruit.server.common.JettyStartUp"
+		init-method="start">
+		<constructor-arg name="host" type="java.lang.String"
+			value="${dragonfruit.server.host}" />
+		<constructor-arg name="port" type="java.lang.String"
+			value="${dragonfruit.server.port}" />
+	</bean>
 
-    <!-- 定时任务配置 -->
-    <!-- 开启这个配置，spring才能识别@Scheduled注解 -->
-    <task:annotation-driven scheduler="qbScheduler" mode="proxy"/>
-    <task:scheduler id="qbScheduler" pool-size="10"/>
+	<!-- base configurations and component scan -->
+	<!-- 通过这些配置就不需要对DAO，Logic等层的bean进行配置文件编写bean了 -->
+	<context:annotation-config />
+	<context:component-scan base-package="dragonfruit.server" />
+
+	<!-- 定时任务配置 -->
+	<!-- 开启这个配置，spring才能识别@Scheduled注解 -->
+	<task:annotation-driven scheduler="qbScheduler"
+		mode="proxy" />
+	<task:scheduler id="qbScheduler" pool-size="10" />
 </beans>
