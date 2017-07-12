@@ -7,24 +7,22 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
 import dragonfruit.server.service.cache.UserRegisterCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import dragonfruit.server.Main;
+import dragonfruit.server.common.ext.DragonfruitException;
+import dragonfruit.server.common.i18n.I18nConstances;
 import dragonfruit.server.entity.*;
-import dragonfruit.server.entity.front.ResultMessage;
 import dragonfruit.server.entity.front.vos.UserVO;
 import dragonfruit.server.logic.*;
 import dragonfruit.server.service.cache.UserBindCache;
 import dragonfruit.server.util.JsonUtils;
+import xuyihao.i18n.I18nContext;
+import xuyihao.i18n.I18nUtils;
 
 /**
  * Created by Xuyh at 2017年3月22日 下午8:23:24.
  */
 @Path("/user")
 public class UserService {
-	private Logger logger = LoggerFactory.getLogger(UserService.class);
-
 	private UserLogic getUserLogic() {
 		return (UserLogic) Main.getBean("userLogic");
 	}
@@ -39,17 +37,16 @@ public class UserService {
 	@Path("/{userName}/exists")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String userNameExists(@PathParam("userName") String userName) {
+	public Map<String, Object> userNameExists(@PathParam("userName") String userName) throws Exception {
 		if (userName == null || userName.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Path param userName can not be null!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, "userName");
 		Map<String, Object> data = new HashMap<>();
 		if (!isUserNameExists(userName)) {//用户名不存在
 			data.put("exist", false);
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Query succeeded!"));
 		} else {
 			data.put("exist", true);
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Query succeeded!"));
 		}
+		return data;
 	}
 
 	/**
@@ -82,20 +79,15 @@ public class UserService {
 	@Path("/register")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String registerUser(String json /*, String verifyBy*/) {
+	public boolean registerUser(String json /*, String verifyBy*/) throws Exception {
 		User user;
-		try {
-			user = (User) JsonUtils.JsonToObj(json, User.class);
-			if (isUserNameExists(user.getName()))
-				return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("User name already exists!"));
-			if (getUserLogic().register(user, UserLogic.VERIFY_BY_EMAIL)) {
-				return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Register cache save succeeded!"));
-			} else {
-				return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Register cache save failed!"));
-			}
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
+		user = (User) JsonUtils.JsonToObj(json, User.class);
+		if (isUserNameExists(user.getName()))
+			throw new DragonfruitException(I18nConstances.USER_NAME_EXISTS, user.getName());
+		if (getUserLogic().register(user, UserLogic.VERIFY_BY_EMAIL)) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 
@@ -120,28 +112,25 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.TEXT_HTML + "; charset=utf-8")
 	public String verifyRegister(@PathParam("userName") String userName,
-			@QueryParam("verificationCode") String verificationCode) {
+			@QueryParam("verificationCode") String verificationCode) throws Exception {
 		if (userName == null || userName.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Path param userName can not be null!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, "userName");
 		if (verificationCode == null || verificationCode.equals(""))
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult("Query param verificationCode can not be null!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, "verificationCode");
 		String userId;
-		try {
-			userId = getUserLogic().registerVerify(userName, verificationCode);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+		userId = getUserLogic().registerVerify(userName, verificationCode);
+		//TODO test
 		if (userId != null) {//验证成功
 			String tocken = UserBindCache.addBoundUser(userId);
 			Map<String, String> data = new HashMap<>();
 			data.put("userId", userId);
 			data.put("tocken", tocken);
-			return String.format(
-					"<html><head><title>用户注册验证成功</title></head><body><pre>你好, %s !你已验证注册成功。请重新登录。</pre></body></html>", userName);
+			//return String.format(
+			//		"<html><head><title>用户注册验证成功</title></head><body><pre>你好, %s !你已验证注册成功。请重新登录。</pre></body></html>", userName);
+			return I18nUtils.getMessage(I18nContext.getLanguage(), I18nConstances.USER_VERIFY_SUCCESS_HTML_STRING, userName);
 		} else {
-			return "<html><head><title>用户注册验证成功</title></head><body><pre>验证注册失败。请重新注册。</pre></body></html>";
+			//return "<html><head><title>用户注册验证失败</title></head><body><pre>验证注册失败。请重新注册。</pre></body></html>";
+			return I18nUtils.getMessage(I18nContext.getLanguage(), I18nConstances.USER_VERIFY_FAIL_HTML_STRING);
 		}
 	}
 
@@ -165,29 +154,23 @@ public class UserService {
 	@Path("/register/verify")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String verifyRegisterByPost(String json) {
+	public Map<String, String> verifyRegisterByPost(String json) throws Exception {
 		if (json == null || json.equals(""))
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult("Param can not be null!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_EMPTY);
 		@SuppressWarnings("unchecked")
 		Map<String, String> verifyInfos = JsonUtils.stringToMap(json);
 		String userName = verifyInfos.get("userName");
 		String verificationCode = verifyInfos.get("verificationCode");
 		String userId;
-		try {
-			userId = getUserLogic().registerVerify(userName, verificationCode);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+		userId = getUserLogic().registerVerify(userName, verificationCode);
 		if (userId != null) {
 			String tocken = UserBindCache.addBoundUser(userId);
 			Map<String, String> data = new HashMap<>();
 			data.put("userId", userId);
 			data.put("tocken", tocken);
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Verify user succeeded!"));
+			return data;
 		} else {
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Verify user failed!"));
+			throw new DragonfruitException(I18nConstances.USER_REGISTER_VERIFY_FAILED);
 		}
 	}
 
@@ -206,21 +189,13 @@ public class UserService {
 	@Path("/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String updateUser(@CookieParam("tocken") String tocken, String json) {
+	public boolean updateUser(@CookieParam("tocken") String tocken, String json) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
-		User user = null;
-		try {
-			user = (User) JsonUtils.JsonToObj(json, User.class);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
+		User user = (User) JsonUtils.JsonToObj(json, User.class);
 		user.setId(userId);
-		if (!getUserLogic().updateUser(user))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Update user failed!"));
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Update user succeeded!"));
+		return getUserLogic().updateUser(user);
 	}
 
 	/**
@@ -243,30 +218,22 @@ public class UserService {
 	@Path("/login")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String bindUser(String json) {
+	public Map<String, String> bindUser(String json) throws Exception {
 		@SuppressWarnings("unchecked")
 		Map<String, String> bindInfos = JsonUtils.stringToMap(json);
 		String userName = bindInfos.get("name");
 		String userPwd = bindInfos.get("password");
-		User user = null;
-		try {
-			user = getUserLogic().getByName(userName);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+		User user = getUserLogic().getByName(userName);
 		if (user == null || user.getId() == null)
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult(String.format("User [%s] does not exists!", userName)));
+			throw new DragonfruitException(I18nConstances.USER_NOT_EXISTS, userName);
 		if (!user.getPassword().equals(userPwd))
-			return JsonUtils.objectToJsonStr(ResultMessage
-					.wrapFailureResult(String.format("Bind failed! Password for user [%s] does not match!", userName)));
+			throw new DragonfruitException(I18nConstances.USER_LOGIN_FAILED, userName);
 		String userId = user.getId();
 		String tocken = UserBindCache.addBoundUser(userId);
 		Map<String, String> data = new HashMap<>();
 		data.put("userId", userId);
 		data.put("tocken", tocken);
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, null));
+		return data;
 	}
 
 	/**
@@ -283,15 +250,13 @@ public class UserService {
 	@Path("/logout")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String unbindUser(@CookieParam("tocken") String tocken) {
+	public boolean unbindUser(@CookieParam("tocken") String tocken) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId != null) {
 			UserBindCache.removeBoundUserTocken(tocken);
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapSuccessResult(String.format("User [%s] logout succeeded!", userId)));
+			return true;
 		} else {
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult(String.format("User [%s] logout failed!", userId)));
+			return false;
 		}
 	}
 
@@ -305,21 +270,14 @@ public class UserService {
 	@Path("/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String deleteUser(@CookieParam("tocken") String tocken) {
+	public boolean deleteUser(@CookieParam("tocken") String tocken) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId != null) {
 			UserBindCache.removeBoundUserTocken(tocken);
-			try {
-				getUserLogic().deleteById(userId);
-			} catch (Exception e) {
-				logger.warn(e.getMessage());
-				return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-			}
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapSuccessResult(String.format("Delete user [%s] succeeded!", userId)));
+			getUserLogic().deleteById(userId);
+			return true;
 		} else {
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult(String.format("Delete user [%s] failed!", userId)));
+			return false;
 		}
 	}
 
@@ -337,21 +295,15 @@ public class UserService {
 	@Path("/info")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserInfo(@CookieParam("tocken") String tocken) {
+	public UserVO getUserInfo(@CookieParam("tocken") String tocken) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
-		User user = null;
-		try {
-			user = getUserLogic().getById(userId);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
+		User user = getUserLogic().getById(userId);
 		if (user == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Not user match for tocken!"));
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		UserVO userVO = new UserVO(user.getId(), user.getName(), user.getPassword(), user.getPhoneNum(), user.getEmail(),
 				user.getSignature(), user.getNickName());
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(userVO, "Get user info succeeded!"));
+		return userVO;
 	}
 }

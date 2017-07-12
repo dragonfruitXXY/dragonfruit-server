@@ -4,6 +4,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import xuyihao.i18n.I18nContext;
 import xuyihao.i18n.I18nUtils;
 
@@ -13,6 +16,8 @@ import xuyihao.i18n.I18nUtils;
  * Created by xuyh at 2017年7月12日 下午3:05:38.
  */
 public class RestExceptionHandler implements ExceptionMapper<Exception> {
+	private static Logger logger = LoggerFactory.getLogger(RestExceptionHandler.class);
+
 	@Override
 	public Response toResponse(Exception exception) {
 		return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
@@ -40,6 +45,7 @@ public class RestExceptionHandler implements ExceptionMapper<Exception> {
 				message = errorCode;
 		} else {
 			message = throwable.getMessage();
+			logger.warn(message);
 		}
 		return message;
 	}

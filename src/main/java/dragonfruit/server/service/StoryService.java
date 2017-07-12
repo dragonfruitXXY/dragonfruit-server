@@ -1,17 +1,17 @@
 package dragonfruit.server.service;
 
 import dragonfruit.server.Main;
+import dragonfruit.server.common.ext.DragonfruitException;
+import dragonfruit.server.common.i18n.I18nConstances;
 import dragonfruit.server.entity.Story;
 import dragonfruit.server.entity.StoryContent;
 import dragonfruit.server.entity.StoryType;
-import dragonfruit.server.entity.front.ResultMessage;
 import dragonfruit.server.entity.front.vos.StoryContentNodeVO;
+import dragonfruit.server.entity.front.vos.StoryContentVO;
 import dragonfruit.server.entity.front.vos.StoryVO;
 import dragonfruit.server.logic.*;
 import dragonfruit.server.service.cache.UserBindCache;
 import dragonfruit.server.util.JsonUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -27,8 +27,6 @@ import java.util.Map;
  */
 @Path("/story")
 public class StoryService {
-	private Logger logger = LoggerFactory.getLogger(StoryService.class);
-
 	private StoryTypeLogic getStoryTypeLogic() {
 		return (StoryTypeLogic) Main.getBean("storyTypeLogic");
 	}
@@ -66,25 +64,19 @@ public class StoryService {
 	@Path("/save")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String saveStory(@CookieParam("tocken") String tocken, String json) {
+	public Map<String, Object> saveStory(@CookieParam("tocken") String tocken, String json) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
-		Story story = null;
-		try {
-			story = (Story) JsonUtils.JsonToObj(json, Story.class);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
+		Story story = (Story) JsonUtils.JsonToObj(json, Story.class);
 		String storyId = null;
 		if (story != null) {
 			story.setUserId(userId);
 			storyId = getStoryLogic().save(story);
 		}
-		Map<String, String> data = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
 		data.put("storyId", storyId);
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Save story succeeded!"));
+		return data;
 	}
 
 	/**
@@ -102,24 +94,19 @@ public class StoryService {
 	@Path("/{storyId}/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String deleteStory(@CookieParam("tocken") String tocken, @PathParam("storyId") String storyId) {
+	public boolean deleteStory(@CookieParam("tocken") String tocken, @PathParam("storyId") String storyId)
+			throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		if (storyId == null || storyId.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("StoryId can not be null!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_EMPTY);
 		Story story = getStoryLogic().getById(storyId);
 		if (story == null)
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult(String.format("No story for id [%s]!", storyId)));
+			throw new DragonfruitException(I18nConstances.STORY_NOT_FOUND, storyId);
 		if (!story.getUserId().equals(userId))
-			return JsonUtils.objectToJsonStr(
-					ResultMessage.wrapFailureResult(String.format("Delete story for id [%s] failed! No authority!", storyId)));
-		if (!getStoryLogic().deleteById(storyId))
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult(String.format("Delete story for id [%s] failed!", storyId)));
-		return JsonUtils.objectToJsonStr(
-				ResultMessage.wrapSuccessResult(String.format("Delete story for id [%s] Succeeded!", storyId)));
+			throw new DragonfruitException(I18nConstances.STORY_NO_AUTHORITY, storyId);
+		return getStoryLogic().deleteById(storyId);
 	}
 
 	/**
@@ -139,25 +126,19 @@ public class StoryService {
 	@Path("/content/save")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String saveStoryContent(@CookieParam("tocken") String tocken, String json) {
+	public Map<String, Object> saveStoryContent(@CookieParam("tocken") String tocken, String json) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
-		StoryContent storyContent = null;
-		try {
-			storyContent = (StoryContent) JsonUtils.JsonToObj(json, StoryContent.class);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
+		StoryContent storyContent = (StoryContent) JsonUtils.JsonToObj(json, StoryContent.class);
 		String storyContentId = null;
 		if (storyContent != null) {
 			storyContent.setUserId(userId);
 			storyContentId = getStoryContentLogic().save(storyContent);
 		}
-		Map<String, String> data = new HashMap<>();
+		Map<String, Object> data = new HashMap<>();
 		data.put("storyContentId", storyContentId);
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Save story content succeeded!"));
+		return data;
 	}
 
 	/**
@@ -175,25 +156,19 @@ public class StoryService {
 	@Path("/content/{storyContentId}/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String deleteStoryContent(@CookieParam("tocken") String tocken,
-			@PathParam("storyContentId") String storyContentId) {
+	public boolean deleteStoryContent(@CookieParam("tocken") String tocken,
+			@PathParam("storyContentId") String storyContentId) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		if (storyContentId == null || storyContentId.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("StoryContentId can not be null!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_EMPTY);
 		StoryContent storyContent = getStoryContentLogic().getById(storyContentId);
 		if (storyContent == null)
-			return JsonUtils.objectToJsonStr(
-					ResultMessage.wrapFailureResult(String.format("No story content for id [%s]!", storyContentId)));
+			throw new DragonfruitException(I18nConstances.STORY_CONTENT_NOT_FOUND, storyContentId);
 		if (!storyContent.getUserId().equals(userId))
-			return JsonUtils.objectToJsonStr(ResultMessage
-					.wrapFailureResult(String.format("Delete story content for id [%s] failed! No authority!", storyContentId)));
-		if (!getStoryContentLogic().deleteById(storyContentId))
-			return JsonUtils.objectToJsonStr(
-					ResultMessage.wrapFailureResult(String.format("Delete story content for id [%s] failed!", storyContentId)));
-		return JsonUtils.objectToJsonStr(
-				ResultMessage.wrapSuccessResult(String.format("Delete story content for id [%s] Succeeded!", storyContentId)));
+			throw new DragonfruitException(I18nConstances.STORY_CONTENT_NO_AUTHORITY, storyContentId);
+		return getStoryContentLogic().deleteById(storyContentId);
 	}
 
 	/**
@@ -211,15 +186,14 @@ public class StoryService {
 	@Path("/{storyId}/like")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String likeStory(@CookieParam("tocken") String tocken, @PathParam("storyId") String storyId) {
+	public boolean likeStory(@CookieParam("tocken") String tocken, @PathParam("storyId") String storyId)
+			throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		if (storyId == null || storyId.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("StoryId can not be null!"));
-		if (!getLikeStoryLogic().like(userId, storyId))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Like story failed!"));
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Like story succeeded!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_EMPTY);
+		return getLikeStoryLogic().like(userId, storyId);
 	}
 
 	/**
@@ -237,16 +211,14 @@ public class StoryService {
 	@Path("/content/{storyContentId}/like")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String likeStoryContent(@CookieParam("tocken") String tocken,
-			@PathParam("storyContentId") String storyContentId) {
+	public boolean likeStoryContent(@CookieParam("tocken") String tocken,
+			@PathParam("storyContentId") String storyContentId) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		if (storyContentId == null || storyContentId.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("StoryContentId can not be null!"));
-		if (!getLikeStoryContentLogic().like(userId, storyContentId))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Like story content failed!"));
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult("Like story content succeeded!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_EMPTY);
+		return getLikeStoryContentLogic().like(userId, storyContentId);
 	}
 
 	/**
@@ -264,9 +236,8 @@ public class StoryService {
 	@Path("/type/all")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getAllStoryType() {
-		List<StoryType> storyTypeList = getStoryTypeLogic().getAll();
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(storyTypeList, "Query succeeded!"));
+	public List<StoryType> getAllStoryType() throws Exception {
+		return getStoryTypeLogic().getAll();
 	}
 
 	/**
@@ -283,11 +254,11 @@ public class StoryService {
 	@Path("/count")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getStorysCount() {
+	public Map<String, Object> getStorysCount() throws Exception {
 		Long count = getStoryLogic().getAllCount();
 		Map<String, Object> data = new HashMap<>();
 		data.put("storyCount", count);
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(data, "Query succeeded!"));
+		return data;
 	}
 
 	/**
@@ -300,17 +271,17 @@ public class StoryService {
 	@Path("/getStories")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getUserStories(@CookieParam("tocken") String tocken) {
+	public List<StoryVO> getUserStories(@CookieParam("tocken") String tocken) throws Exception {
 		String userId = UserBindCache.getBoundUser(tocken);
 		if (userId == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("No user login!"));
+			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		List<Story> storyList = getStoryLogic().getByUserId(userId);
 		List<StoryVO> storyVOs = new ArrayList<>();
 		for (Story story : storyList) {
 			storyVOs.add(new StoryVO(story.getId(), story.getUserId(), story.getStoryTypeId(), story.getName(),
 					story.getDescription(), story.getLike()));
 		}
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(storyVOs, "Query succeeded!"));
+		return storyVOs;
 	}
 
 	/**
@@ -330,28 +301,21 @@ public class StoryService {
 	@Path("/getPage")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getStoryByPage(String json) {
+	public List<StoryVO> getStoryByPage(String json) throws Exception {
 		Map<String, String> queryMap = JsonUtils.stringToMap(json);
 		String pageStr = queryMap.get("page");
 		String sizeStr = queryMap.get("size");
 		if (pageStr == null || sizeStr == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Query param parsing error!"));
-		int page;
-		int size;
-		try {
-			page = Integer.parseInt(pageStr);
-			size = Integer.parseInt(sizeStr);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, "page, size");
+		int page = Integer.parseInt(pageStr);
+		int size = Integer.parseInt(sizeStr);
 		List<Story> storyList = getStoryLogic().getPageByPageSize(page, size);
 		List<StoryVO> storyVOS = new ArrayList<>();
 		for (Story story : storyList) {
 			storyVOS.add(new StoryVO(story.getId(), story.getUserId(), story.getStoryTypeId(), story.getName(),
 					story.getDescription(), story.getLike()));
 		}
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(storyVOS, "Query succeeded!"));
+		return storyVOS;
 	}
 
 	/**
@@ -371,28 +335,21 @@ public class StoryService {
 	@Path("/getLikeDownPage")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getStoryByLikeDown(String json) {
+	public List<StoryVO> getStoryByLikeDown(String json) throws Exception {
 		Map<String, String> queryMap = JsonUtils.stringToMap(json);
 		String pageStr = queryMap.get("page");
 		String sizeStr = queryMap.get("size");
 		if (pageStr == null || sizeStr == null)
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Query param parsing error!"));
-		int page;
-		int size;
-		try {
-			page = Integer.parseInt(pageStr);
-			size = Integer.parseInt(sizeStr);
-		} catch (Exception e) {
-			logger.warn(e.getMessage());
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult(e.getMessage()));
-		}
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, "page, size");
+		int page = Integer.parseInt(pageStr);
+		int size = Integer.parseInt(sizeStr);
 		List<Story> storyList = getStoryLogic().getPageByLikeDown(page, size);
 		List<StoryVO> storyVOS = new ArrayList<>();
 		for (Story story : storyList) {
 			storyVOS.add(new StoryVO(story.getId(), story.getUserId(), story.getStoryTypeId(), story.getName(),
 					story.getDescription(), story.getLike()));
 		}
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(storyVOS, "Query succeeded!"));
+		return storyVOS;
 	}
 
 	/**
@@ -409,14 +366,12 @@ public class StoryService {
 	@Path("/{storyId}/info")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getStoryInfo(@PathParam("storyId") String storyId) {
+	public StoryVO getStoryInfo(@PathParam("storyId") String storyId) throws Exception {
 		if (storyId == null || storyId.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Query param parsing error!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, storyId);
 		Story story = getStoryLogic().getById(storyId);
-		if (story == null)
-			return JsonUtils
-					.objectToJsonStr(ResultMessage.wrapFailureResult(String.format("No story found for id [%s]!", storyId)));
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(story, "Query succeeded!"));
+		return story == null ? null : new StoryVO(story.getId(), story.getUserId(), story.getStoryTypeId(), story.getName(),
+				story.getDescription(), story.getLike());
 	}
 
 	/**
@@ -433,14 +388,13 @@ public class StoryService {
 	@Path("/content/{storyContentId}/info")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getStoryContentInfo(@PathParam("storyContentId") String storyContentId) {
+	public StoryContentVO getStoryContentInfo(@PathParam("storyContentId") String storyContentId) throws Exception {
 		if (storyContentId == null || storyContentId.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Path param parsing error!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, storyContentId);
 		StoryContent storyContent = getStoryContentLogic().getById(storyContentId);
-		if (storyContent == null)
-			return JsonUtils.objectToJsonStr(
-					ResultMessage.wrapFailureResult(String.format("No storyContent found for id [%s]!", storyContentId)));
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(storyContent, "Query succeeded!"));
+		return storyContent == null ? null
+				: new StoryContentVO(storyContent.getId(), storyContent.getUserId(), storyContent.getStoryId(),
+						storyContent.getHeadContentId(), storyContent.getContent(), storyContent.getLike());
 	}
 
 	/**
@@ -460,18 +414,17 @@ public class StoryService {
 	@Path("/{storyId}/content/tree")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String getStoryContentTree(@PathParam("storyId") String storyId) {
+	public StoryContentNodeVO getStoryContentTree(@PathParam("storyId") String storyId) throws Exception {
 		if (storyId == null || storyId.equals(""))
-			return JsonUtils.objectToJsonStr(ResultMessage.wrapFailureResult("Path param parsing error!"));
+			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, storyId);
 		//递归编织树状结构
 		StoryContent parent = getStoryContentLogic().getHeadContent(storyId);
 		if (parent == null)
-			return JsonUtils.objectToJsonStr(
-					ResultMessage.wrapFailureResult(String.format("No head storyContent found for story id [%s]!", storyId)));
+			return null;
 		StoryContentNodeVO parentNode = new StoryContentNodeVO(parent.getId(), parent.getUserId(), parent.getStoryId(),
 				parent.getHeadContentId(), parent.getContent(), parent.getLike());
 		buildStoryContentTree(parentNode);
-		return JsonUtils.objectToJsonStr(ResultMessage.wrapSuccessResult(parentNode, "Query succeeded!"));
+		return parentNode;
 	}
 
 	private void buildStoryContentTree(StoryContentNodeVO parentNode) {
