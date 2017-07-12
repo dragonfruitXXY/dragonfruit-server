@@ -16,6 +16,11 @@
 		<param-name>resteasy.servlet.mapping.prefix</param-name>
 		<param-value>/dragonfruit/rest/v1</param-value>
 	</context-param>
+	<!-- 配置统一异常处理handler -->
+	<context-param>
+		<param-name>resteasy.providers</param-name>
+		<param-value>dragonfruit.server.common.ext.RestExceptionHandler</param-value>
+	</context-param>
 	<listener>
 		<listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
 	</listener>
@@ -46,6 +51,15 @@
 	</filter>
 	<filter-mapping>
 		<filter-name>cross-origin</filter-name>
+		<url-pattern>/dragonfruit/rest/v1/*</url-pattern>
+	</filter-mapping>
+	<!-- 自定义全局处理filter -->
+	<filter>
+		<filter-name>global-filter</filter-name>
+		<filter-class>dragonfruit.server.common.ext.GlobalFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>global-filter</filter-name>
 		<url-pattern>/dragonfruit/rest/v1/*</url-pattern>
 	</filter-mapping>
 </web-app>

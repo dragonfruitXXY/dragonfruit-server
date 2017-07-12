@@ -116,12 +116,19 @@
 			<version>9.4.2.v20170220</version>
 		</dependency>
 
-		<!-- For resteasy -->
+		<!-- For Jboss resteasy -->
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
 			<version>3.1.0.Final</version>
 		</dependency>
+		<!-- 提供resteasy 返回数据中 JSON格式的转换 -->
+		<dependency>
+			<groupId>org.jboss.resteasy</groupId>
+			<artifactId>resteasy-jackson-provider</artifactId>
+			<version>3.1.0.Final</version>
+		</dependency>
+
 
 		<!-- For logger -->
 		<dependency>
