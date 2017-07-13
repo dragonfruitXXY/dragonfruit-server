@@ -1,8 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <StoryTypes>
-	<StoryType code="science" name="科学" />
-	<StoryType code="medical" name="医学" />
-	<StoryType code="military" name="军事" />
-	<StoryType code="food" name="食物" />
-	<StoryType code="funny" name="搞笑" />
+	<StoryType code="science">
+		<nameMap>
+			<name language="zh_CN" nameValue="科学" />
+			<name language="en_US" nameValue="science" />
+		</nameMap>
+	</StoryType>
+	<StoryType code="medical">
+		<nameMap>
+			<name language="zh_CN" nameValue="医学" />
+			<name language="en_US" nameValue="medical" />
+		</nameMap>
+	</StoryType>
+	<StoryType code="military">
+		<nameMap>
+			<name language="zh_CN" nameValue="军事" />
+			<name language="en_US" nameValue="military" />
+		</nameMap>
+	</StoryType>
+	<StoryType code="food" name="食物">
+		<nameMap>
+			<name language="zh_CN" nameValue="食物" />
+			<name language="en_US" nameValue="food" />
+		</nameMap>
+	</StoryType>
+	<StoryType code="funny" name="搞笑">
+		<nameMap>
+			<name language="zh_CN" nameValue="搞笑" />
+			<name language="en_US" nameValue="funny" />
+		</nameMap>
+	</StoryType>
 </StoryTypes>

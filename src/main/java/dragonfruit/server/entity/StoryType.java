@@ -1,5 +1,8 @@
 package dragonfruit.server.entity;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -17,7 +20,15 @@ public class StoryType {
 	private String id;
 	@Indexed
 	private String code;
-	private String name;
+	/**
+	 * <pre>
+	 * 	国际化
+	 * </pre>
+	 * 
+	 * 语言及语言对应的名称
+	 * languge=name
+	 */
+	private Map<String, String> nameMap;
 
 	public String getId() {
 		return id;
@@ -35,11 +46,21 @@ public class StoryType {
 		this.code = code;
 	}
 
-	public String getName() {
-		return name;
+	public void addName(String language, String name) {
+		if (nameMap == null)
+			nameMap = new HashMap<>();
+		nameMap.put(language, name);
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public String getName(String language) {
+		return nameMap.get(language);
+	}
+
+	public Map<String, String> getNameMap() {
+		return nameMap;
+	}
+
+	public void setNameMap(Map<String, String> nameMap) {
+		this.nameMap = nameMap;
 	}
 }

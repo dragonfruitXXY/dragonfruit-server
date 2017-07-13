@@ -8,10 +8,12 @@ import dragonfruit.server.entity.StoryContent;
 import dragonfruit.server.entity.StoryType;
 import dragonfruit.server.entity.front.vos.StoryContentNodeVO;
 import dragonfruit.server.entity.front.vos.StoryContentVO;
+import dragonfruit.server.entity.front.vos.StoryTypeVO;
 import dragonfruit.server.entity.front.vos.StoryVO;
 import dragonfruit.server.logic.*;
 import dragonfruit.server.service.cache.UserBindCache;
 import dragonfruit.server.util.JsonUtils;
+import xuyihao.i18n.I18nContext;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -228,8 +230,13 @@ public class StoryService {
 	@Path("/type/all")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<StoryType> getAllStoryType() throws Exception {
-		return getStoryTypeLogic().getAll();
+	public List<StoryTypeVO> getAllStoryType() throws Exception {
+		List<StoryTypeVO> storyTypeVOs = new ArrayList<>();
+		for (StoryType storyType : getStoryTypeLogic().getAll()) {
+			storyTypeVOs
+					.add(new StoryTypeVO(storyType.getId(), storyType.getCode(), storyType.getName(I18nContext.getLanguage())));
+		}
+		return storyTypeVOs;
 	}
 
 	/**

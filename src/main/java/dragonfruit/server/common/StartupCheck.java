@@ -63,7 +63,10 @@ public class StartupCheck {
 			for (Element element : storyTypeList) {
 				StoryType storyType = new StoryType();
 				storyType.setCode(element.attributeValue("code"));
-				storyType.setName(element.attributeValue("name"));
+				List<Element> nameMapElements = element.element("nameMap").elements();
+				for (Element name : nameMapElements) {
+					storyType.addName(name.attributeValue("language"), name.attributeValue("nameValue"));
+				}
 				storyTypeLogic.save(storyType);
 			}
 			logger.info("Read XML file data succeeded!");
