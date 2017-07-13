@@ -8,10 +8,12 @@ package dragonfruit.server.common.i18n;
 public class I18nConstances {
 	//---------------data---------------------------
 	public static final String TEST_CODE_HELLO = "test.code.hello";
-	
+
 	public static final String USER_VERIFY_SUCCESS_HTML_STRING = "user.verify.success.html.string";
 	public static final String USER_VERIFY_FAIL_HTML_STRING = "user.verify.fail.html.string";
-	
+	public static final String USER_VERIFY_EMAIL_CONTENT = "user.verify.email.content";
+	public static final String USER_VERIFY_EMAIL_SUBJECT = "user.verify.email.subject";
+
 	//---------------exception message code---------
 	public static final String REQUEST_PARAM_EMPTY = "request.param.empty";
 	public static final String REQUEST_PARAM_ERROR = "request.param.error";

@@ -1,6 +1,7 @@
 package dragonfruit.server.logic.impl;
 
 import dragonfruit.server.common.AppProperties;
+import dragonfruit.server.common.i18n.I18nConstances;
 import dragonfruit.server.entity.UserRegister;
 import dragonfruit.server.service.cache.UserRegisterCache;
 import dragonfruit.server.util.DateUtils;
@@ -18,6 +19,8 @@ import xuyihao.email.sender.entity.EmailCredential;
 import xuyihao.email.sender.entity.EmailTextMessage;
 import xuyihao.email.sender.entity.dict.EmailProtocol;
 import xuyihao.email.sender.util.EmailUtils;
+import xuyihao.i18n.I18nContext;
+import xuyihao.i18n.I18nUtils;
 
 import javax.mail.MessagingException;
 
@@ -41,7 +44,6 @@ public class UserLogicImpl implements UserLogic {
 	}
 
 	public boolean registerByEmailVerification(User user) {
-		// TODO: 2017/7/7 邮件信息国际化
 		if (user == null)
 			return false;
 		if (user.getName() == null)
@@ -76,23 +78,10 @@ public class UserLogicImpl implements UserLogic {
 				AppProperties.getProperty("dragonfruit.mail.user"),
 				AppProperties.getProperty("dragonfruit.mail.password"));
 		EmailTextMessage message = new EmailTextMessage(AppProperties.getProperty("dragonfruit.mail.user"),
-				new String[] { userRegister.getEmail() }, "Dragonfruit用户注册验证", String.format("<html>\n" +
-						"\t<head>\n" +
-						"\t\t<title>Dragonfruit用户注册验证</title>\n" +
-						"\t</head>\n" +
-						"\n" +
-						"\t<body>\n" +
-						"\t\t<pre>\n" +
-						"\t\t\t你好，新用户。\n" +
-						"\t\t\t\n" +
-						"\t\t\t\t验证码为:[%s],\n" +
-						"\t\t\t\n" +
-						"\t\t\t\t点击下方链接验证或者手动输入验证码验证.\n" +
-						"\n" +
-						"\t\t\t\t<a href=\"%s\">点击链接验证</a>\n" +
-						"\t\t</pre>\n" +
-						"\t</body>\n" +
-						"</html>", userRegister.getVerificationCode(),
+				new String[] { userRegister.getEmail() },
+				I18nUtils.getMessage(I18nContext.getLanguage(), I18nConstances.USER_VERIFY_EMAIL_SUBJECT),
+				I18nUtils.getMessage(I18nContext.getLanguage(), I18nConstances.USER_VERIFY_EMAIL_CONTENT,
+						userRegister.getVerificationCode(),
 						String.format(AppProperties.getProperty("dragonfruit.mail.verify.url"),
 								AppProperties.getProperty("dragonfruit.server.host"),
 								AppProperties.getProperty("dragonfruit.server.port"), userRegister.getName(),
