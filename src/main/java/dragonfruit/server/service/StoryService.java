@@ -52,7 +52,6 @@ public class StoryService {
 	 *
 	 * <pre>
 	 *     请求数据格式:{"storyTypeId":"", "name":"", ""description:""}
-	 *     返回数据格式:{"result":"true/false", "message":"", "data":{"storyId":""}}
 	 *     需要在Cookie中设置tocken
 	 * </pre>
 	 *
@@ -114,7 +113,6 @@ public class StoryService {
 	 *
 	 * <pre>
 	 *     请求数据格式:{"storyId":"", "headContentId":"", "content":""}
-	 *     返回数据格式:{"result":"true/false", "message":"", "data":{"storyContentId":""}}
 	 *     需要在Cookie中设置tocken
 	 * </pre>
 	 *
@@ -224,12 +222,6 @@ public class StoryService {
 	/**
 	 * 获取所有故事类型
 	 *
-	 * <pre>
-	 *     返回数据格式:{"result":"true/false", "message":"",
-	 *                      "data":[{"id":"", ""code:"", ""name:""},
-	 *                      {"id":"", ""code:"", ""name:""}]}
-	 * </pre>
-	 *
 	 * @return
 	 */
 	@GET
@@ -242,11 +234,6 @@ public class StoryService {
 
 	/**
 	 * 获取故事总数
-	 *
-	 * <pre>
-	 *     返回数据格式:{"result":"true/false", "message":"",
-	 *                      "data":{"storyCount":""}}
-	 * </pre>
 	 *
 	 * @return
 	 */
@@ -289,7 +276,6 @@ public class StoryService {
 	 *
 	 * <pre>
 	 *     请求数据格式:{"page":"", "size":""}
-	 *     返回数据格式:{"result":"true/false", "message":"", "data":[{}, {}]}
 	 *     page 从 0 开始
 	 * </pre>
 	 *
@@ -323,7 +309,6 @@ public class StoryService {
 	 *
 	 * <pre>
 	 *     请求数据格式:{"page":"", "size":""}
-	 *     返回数据格式:{"result":"true/false", "message":"", "data":[{}, {}]}
 	 *     page 从 0 开始
 	 * </pre>
 	 *
@@ -355,10 +340,6 @@ public class StoryService {
 	/**
 	 * 获取故事详情
 	 *
-	 * <pre>
-	 *     返回数据格式:{"result":"true/false", "message":"", "data":[{}, {}]}
-	 * </pre>
-	 *
 	 * @param storyId
 	 * @return
 	 */
@@ -376,10 +357,6 @@ public class StoryService {
 
 	/**
 	 * 获取故事内容详情
-	 *
-	 * <pre>
-	 *     返回数据格式:{"result":"true/false", "message":"", "data":[{}, {}]}
-	 * </pre>
 	 *
 	 * @param storyContentId
 	 * @return
@@ -401,10 +378,10 @@ public class StoryService {
 	 * 获取故事内容树状结构
 	 *
 	 * <pre>
-	 *     返回数据格式:{"result":"true/false", "message":"", "data":{"id":"", "userId":"", ""storyId:"", ""headContentId:"", "content":"", ""like:"",
+	 *     返回数据格式:{"id":"", "userId":"", ""storyId:"", ""headContentId:"", "content":"", ""like:"",
 	 *                      "childNodeList":[{"id":"", "userId":"", ""storyId:"", ""headContentId:"", "content":"", ""like:"",
 	 *                      "childNodeList":[]}, {"id":"", "userId":"", ""storyId:"", ""headContentId:"", "content":"", ""like:"",
-	 *                      "childNodeList":[]}]}}
+	 *                      "childNodeList":[]}]}
 	 * </pre>
 	 *
 	 * @param storyId
@@ -428,7 +405,7 @@ public class StoryService {
 	}
 
 	private void buildStoryContentTree(StoryContentNodeVO parentNode) {
-		//XXX 递归实现树状结构编织
+		// 递归实现树状结构编织
 		List<StoryContent> storyContentList = getStoryContentLogic().getByHeadContentId(parentNode.getId());
 		for (StoryContent storyContent : storyContentList) {
 			StoryContentNodeVO storyContentNodeVO = new StoryContentNodeVO(storyContent.getId(), storyContent.getUserId(),

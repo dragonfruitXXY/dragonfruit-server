@@ -32,11 +32,13 @@ public class GlobalFilter implements Filter {
 		//获取前端传递的语言信息，从cookie中获取
 		HttpServletRequest httpServletRequest = (HttpServletRequest) request;
 		Cookie[] cookies = httpServletRequest.getCookies();
-		for (Cookie cookie : cookies) {
-			if (cookie.getName().equals(COOKIE_NAME_LANGUAGE)) {
-				String lang = cookie.getValue();
-				I18nContext.setLanguage(lang);
-				break;
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(COOKIE_NAME_LANGUAGE)) {
+					String lang = cookie.getValue();
+					I18nContext.setLanguage(lang);
+					break;
+				}
 			}
 		}
 

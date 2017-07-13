@@ -69,8 +69,6 @@ public class UserService {
 	 *
 	 * 	返回成功即用户注册信息保存到缓存中成功
 	 *
-	 * 	返回参数：{"result":true/false, "message":"", "data":}
-	 *
 	 * </pre>
 	 *
 	 * @return
@@ -80,8 +78,7 @@ public class UserService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean registerUser(String json /*, String verifyBy*/) throws Exception {
-		User user;
-		user = (User) JsonUtils.JsonToObj(json, User.class);
+		User user = (User) JsonUtils.JsonToObj(json, User.class);
 		if (isUserNameExists(user.getName()))
 			throw new DragonfruitException(I18nConstances.USER_NAME_EXISTS, user.getName());
 		if (getUserLogic().register(user, UserLogic.VERIFY_BY_EMAIL)) {
@@ -98,9 +95,7 @@ public class UserService {
 	 *     请求格式:/user/register/{userName}/verify?verificationCode=
 	 *
 	 *     返回参数：如果验证成功返回用户id和tocken
-	 *        {"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
 	 *
-	 * 		之后的请求需要在cookie中设置tocken
 	 * </pre>
 	 *
 	 * @param userName
@@ -119,17 +114,13 @@ public class UserService {
 			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, "verificationCode");
 		String userId;
 		userId = getUserLogic().registerVerify(userName, verificationCode);
-		//TODO test
 		if (userId != null) {//验证成功
 			String tocken = UserBindCache.addBoundUser(userId);
 			Map<String, String> data = new HashMap<>();
 			data.put("userId", userId);
 			data.put("tocken", tocken);
-			//return String.format(
-			//		"<html><head><title>用户注册验证成功</title></head><body><pre>你好, %s !你已验证注册成功。请重新登录。</pre></body></html>", userName);
 			return I18nUtils.getMessage(I18nContext.getLanguage(), I18nConstances.USER_VERIFY_SUCCESS_HTML_STRING, userName);
 		} else {
-			//return "<html><head><title>用户注册验证失败</title></head><body><pre>验证注册失败。请重新注册。</pre></body></html>";
 			return I18nUtils.getMessage(I18nContext.getLanguage(), I18nConstances.USER_VERIFY_FAIL_HTML_STRING);
 		}
 	}
@@ -141,7 +132,6 @@ public class UserService {
 	 *     请求格式:{"userName":"", "verificationCode":""}
 	 *
 	 *     返回参数：如果验证成功返回用户id和tocken
-	 *        {"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
 	 *
 	 * 		之后的请求需要在cookie中设置tocken
 	 * </pre>
@@ -199,14 +189,11 @@ public class UserService {
 	}
 
 	/**
-	 * 用户登录,成功之后返回用户详情,供客户端使用
+	 * 用户登录,成功之后返回用户ID,供客户端使用
 	 * <p>
 	 * <pre>
 	 * 	请求参数：
 	 *    {"name":"", "password":""}
-	 *
-	 * 	返回参数：
-	 *    {"result":true/false, "message":"", "data":{"userId":"", "tocken":""}}
 	 *
 	 * 	之后的请求需要在cookie中设置tocken
 	 * </pre>
