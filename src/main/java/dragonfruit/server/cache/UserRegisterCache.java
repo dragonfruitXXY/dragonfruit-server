@@ -98,10 +98,10 @@ public class UserRegisterCache {
 		if (userRegister == null)
 			return false;
 		//如果修改了email
-		if (email != null || !email.equals(""))
+		if (email != null && !email.equals(""))
 			userRegister.setEmail(email);
 		//如果修改了phoneNumber
-		if (phoneNumber != null || !phoneNumber.equals(""))
+		if (phoneNumber != null && !phoneNumber.equals(""))
 			userRegister.setPhoneNum(phoneNumber);
 		return userRegister.changeVerificationCode(userName, verificationCode);
 	}

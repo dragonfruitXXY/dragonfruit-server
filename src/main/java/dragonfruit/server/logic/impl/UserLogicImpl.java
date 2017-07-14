@@ -36,7 +36,6 @@ public class UserLogicImpl implements UserLogic {
 	}
 
 	public boolean register(User user, String verifyBy) {
-		//TODO test
 		if (user == null)
 			return false;
 		if (user.getName() == null)
@@ -68,7 +67,6 @@ public class UserLogicImpl implements UserLogic {
 	}
 
 	public boolean updateVerificationCode(String userName, String email, String phoneNumber, String verifyBy) {
-		// TODO: 2017/7/14  test
 		UserRegisterCache.modifyCacheVerificationCode(userName, RandomUtils.getRandomVerificationString(6), email,
 				phoneNumber);//设置6位验证码
 		boolean flag;

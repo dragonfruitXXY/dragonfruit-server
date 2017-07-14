@@ -18,6 +18,7 @@ public class I18nConstances {
 	public static final String REQUEST_PARAM_EMPTY = "request.param.empty";
 	public static final String REQUEST_PARAM_ERROR = "request.param.error";
 	public static final String USER_NAME_EXISTS = "user.name.exists";
+	public static final String USER_NAME_CACHE_NOT_EXISTS = "user.name.cache.not.exists";
 	public static final String USER_REGISTER_VERIFY_FAILED = "user.register.verify.failed";
 	public static final String USER_NOT_LOGIN = "user.not.login";
 	public static final String USER_NOT_EXISTS = "user.not.exists";
