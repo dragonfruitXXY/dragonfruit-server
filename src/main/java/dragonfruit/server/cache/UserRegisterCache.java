@@ -1,4 +1,4 @@
-package dragonfruit.server.service.cache;
+package dragonfruit.server.cache;
 
 import dragonfruit.server.entity.UserRegister;
 import dragonfruit.server.util.DateUtils;
@@ -83,6 +83,27 @@ public class UserRegisterCache {
 		if (userRegister == null)
 			return false;
 		return userRegister.verify(userName, verificationCode);
+	}
+
+	/**
+	 * 更新验证码，同时更新提交时间
+	 * 
+	 * @param userName
+	 * @param verificationCode
+	 * @return
+	 */
+	public static boolean modifyCacheVerificationCode(String userName, String verificationCode, String email,
+			String phoneNumber) {
+		UserRegister userRegister = userRegisterCache.get(userName);
+		if (userRegister == null)
+			return false;
+		//如果修改了email
+		if (email != null || !email.equals(""))
+			userRegister.setEmail(email);
+		//如果修改了phoneNumber
+		if (phoneNumber != null || !phoneNumber.equals(""))
+			userRegister.setPhoneNum(phoneNumber);
+		return userRegister.changeVerificationCode(userName, verificationCode);
 	}
 
 	/**

@@ -11,7 +11,7 @@ import dragonfruit.server.entity.front.vos.StoryContentVO;
 import dragonfruit.server.entity.front.vos.StoryTypeVO;
 import dragonfruit.server.entity.front.vos.StoryVO;
 import dragonfruit.server.logic.*;
-import dragonfruit.server.service.cache.UserBindCache;
+import dragonfruit.server.cache.UserBindCache;
 import dragonfruit.server.util.JsonUtils;
 import xuyihao.i18n.I18nContext;
 

@@ -1,4 +1,4 @@
-package dragonfruit.server.service.cache;
+package dragonfruit.server.cache;
 
 import java.util.HashMap;
 import java.util.Map;

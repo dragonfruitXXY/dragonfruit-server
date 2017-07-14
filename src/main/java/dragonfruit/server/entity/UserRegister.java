@@ -1,5 +1,7 @@
 package dragonfruit.server.entity;
 
+import dragonfruit.server.util.DateUtils;
+
 import java.util.Date;
 
 /**
@@ -97,5 +99,14 @@ public class UserRegister {
 		} else {
 			return false;
 		}
+	}
+
+	public boolean changeVerificationCode(String userName, String verificationCode) {
+		if (!getName().equals(userName))
+			return false;
+		//更新验证码并更新提交时间
+		setVerificationCode(verificationCode);
+		setSubmitTime(DateUtils.currentDateTimeForDate());
+		return true;
 	}
 }

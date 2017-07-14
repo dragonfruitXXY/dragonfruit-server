@@ -3,7 +3,7 @@ package dragonfruit.server.logic.impl;
 import dragonfruit.server.common.AppProperties;
 import dragonfruit.server.common.i18n.I18nConstances;
 import dragonfruit.server.entity.UserRegister;
-import dragonfruit.server.service.cache.UserRegisterCache;
+import dragonfruit.server.cache.UserRegisterCache;
 import dragonfruit.server.util.DateUtils;
 import dragonfruit.server.util.RandomUtils;
 import org.slf4j.Logger;
@@ -36,14 +36,7 @@ public class UserLogicImpl implements UserLogic {
 	}
 
 	public boolean register(User user, String verifyBy) {
-		if (verifyBy.equals(UserLogic.VERIFY_BY_EMAIL))
-			return registerByEmailVerification(user);
-		if (verifyBy.equals(UserLogic.VERIFY_BY_TEXT_MESSAGE))
-			return registerByTextMessageVerification(user);
-		return false;
-	}
-
-	public boolean registerByEmailVerification(User user) {
+		//TODO test
 		if (user == null)
 			return false;
 		if (user.getName() == null)
@@ -59,6 +52,37 @@ public class UserLogicImpl implements UserLogic {
 		userRegister.setSignature(user.getSignature());
 		userRegister.setSubmitTime(DateUtils.currentDateTimeForDate());//设置提交时间
 		userRegister.setVerificationCode(RandomUtils.getRandomVerificationString(6));//设置6位验证码
+		boolean flag;
+		if (verifyBy.equals(UserLogic.VERIFY_BY_EMAIL)) {
+			flag = emailVerify(userRegister);
+		} else if (verifyBy.equals(UserLogic.VERIFY_BY_TEXT_MESSAGE)) {
+			flag = textMessageVerify(userRegister);
+		} else {
+			flag = false;
+		}
+		if (flag) {
+			//验证信息发送成功(email/textMessage)的话添加注册待验证缓存
+			UserRegisterCache.addUserRegister(userRegister);
+		}
+		return flag;
+	}
+
+	public boolean updateVerificationCode(String userName, String email, String phoneNumber, String verifyBy) {
+		// TODO: 2017/7/14  test
+		UserRegisterCache.modifyCacheVerificationCode(userName, RandomUtils.getRandomVerificationString(6), email,
+				phoneNumber);//设置6位验证码
+		boolean flag;
+		if (verifyBy.equals(UserLogic.VERIFY_BY_EMAIL)) {
+			flag = emailVerify(UserRegisterCache.getUserRegisterCache(userName));
+		} else if (verifyBy.equals(UserLogic.VERIFY_BY_TEXT_MESSAGE)) {
+			flag = textMessageVerify(UserRegisterCache.getUserRegisterCache(userName));
+		} else {
+			flag = false;
+		}
+		return flag;
+	}
+
+	private boolean emailVerify(UserRegister userRegister) {
 		//发送验证邮件
 		EmailProtocol protocol;
 		switch (AppProperties.getProperty("dragonfruit.mail.protocol")) {
@@ -88,9 +112,6 @@ public class UserLogicImpl implements UserLogic {
 								userRegister.getVerificationCode())));
 		try {
 			EmailUtils.sendTextEmail(emailCredential, message);
-			// TODO: 2017/7/7 这里逻辑还需要斟酌一下 ，是否需要邮件验证添加一个接口
-			//邮件发送成功的话添加注册待验证缓存
-			UserRegisterCache.addUserRegister(userRegister);
 		} catch (MessagingException e) {
 			logger.warn(e.getMessage());
 			return false;
@@ -98,7 +119,7 @@ public class UserLogicImpl implements UserLogic {
 		return true;
 	}
 
-	public boolean registerByTextMessageVerification(User user) {
+	private boolean textMessageVerify(UserRegister userRegister) {
 		// TODO: 2017/7/7 短信验证以后再说 
 		return false;
 	}

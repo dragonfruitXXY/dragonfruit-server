@@ -25,6 +25,16 @@ public interface UserLogic {
 	boolean register(User user, String verifyBy);
 
 	/**
+	 * 用户重新验证(可更换email，phoneNumber)
+	 * 
+	 * @param userName
+	 * @param email
+	 * @param phoneNumber
+	 * @return
+	 */
+	boolean updateVerificationCode(String userName, String email, String phoneNumber, String verifyBy);
+
+	/**
 	 * 用户注册验证
 	 * 
 	 * <pre>
