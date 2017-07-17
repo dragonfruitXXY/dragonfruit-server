@@ -7,8 +7,7 @@
        http://www.springframework.org/schema/data/mongo/spring-mongo.xsd">
 
 	<mongo:mongo-client id="mongoClient" host="${dragonfruit.mongodb.host}"
-		port="${dragonfruit.mongodb.port}"
-		credentials="${dragonfruit.mongodb.username}:${dragonfruit.mongodb.password}@${dragonfruit.mongodb.databaseName}">
+		port="${dragonfruit.mongodb.port}" credentials="${dragonfruit.mongodb.credentials}">
 		<mongo:client-options connections-per-host="${dragonfruit.mongodb.connectionsPerHost}"
 			min-connections-per-host="${dragonfruit.mongodb.minConnectionsPerHost}"
 			threads-allowed-to-block-for-connection-multiplier="${dragonfruit.mongodb.threadsAllowedToBlockForConnectionMultiplier}"
