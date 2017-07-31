@@ -54,7 +54,7 @@ public class JettyStartUp implements ApplicationContextAware {
 
 		server.start();
 		if (server.isStarted()) {
-			logger.info("Server start succeeded!");
+			logger.info(String.format("Server start succeeded at host:[%s] port:[%s].", host, port));
 		} else {
 			logger.info("Server start failed!");
 		}

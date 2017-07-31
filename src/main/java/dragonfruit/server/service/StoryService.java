@@ -17,6 +17,7 @@ import xuyihao.i18n.I18nContext;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -47,6 +48,26 @@ public class StoryService {
 
 	private LikeStoryContentLogic getLikeStoryContentLogic() {
 		return (LikeStoryContentLogic) Main.getBean("likeStoryContentLogic");
+	}
+
+	/**
+	 * 跨域请求发送options请求时候进行处理
+	 * 
+	 * @param requestMethods
+	 * @param requestHeaders
+	 * @return
+	 * @throws Exception
+	 */
+	@OPTIONS
+	@Path("/{path:.*}")
+	public Response handleCORSRequest(@HeaderParam("Access-Control-Request-Method") final String requestMethods,
+			@HeaderParam("Access-Control-Request-Headers") final String requestHeaders) throws Exception {
+		Response.ResponseBuilder builder = Response.ok();
+		if (requestHeaders != null)
+			builder.header("Access-Control-Allow-Headers", requestHeaders);
+		if (requestMethods != null)
+			builder.header("Access-Control-Allow-Methods", requestMethods);
+		return builder.build();
 	}
 
 	/**
@@ -358,8 +379,9 @@ public class StoryService {
 		if (storyId == null || storyId.equals(""))
 			throw new DragonfruitException(I18nConstances.REQUEST_PARAM_ERROR, storyId);
 		Story story = getStoryLogic().getById(storyId);
-		return story == null ? null : new StoryVO(story.getId(), story.getUserId(), story.getStoryTypeId(), story.getName(),
-				story.getDescription(), story.getLike());
+		return story == null ? null
+				: new StoryVO(story.getId(), story.getUserId(), story.getStoryTypeId(), story.getName(),
+						story.getDescription(), story.getLike());
 	}
 
 	/**

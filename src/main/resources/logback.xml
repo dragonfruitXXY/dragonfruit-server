@@ -38,5 +38,5 @@
 	<logger name="dragonfruit.server" level="INFO"/>
 	<logger name="org.eclipse.jetty" level="ERROR"/>
 	<logger name="org.springframework" level="ERROR"/>
-
+	<logger name="org.jboss.resteasy" level="ERROR"/>
 </configuration>

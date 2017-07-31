@@ -5,6 +5,7 @@ import java.util.Map;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import dragonfruit.server.cache.UserRegisterCache;
 import dragonfruit.server.Main;
@@ -25,6 +26,26 @@ import xuyihao.i18n.I18nUtils;
 public class UserService {
 	private UserLogic getUserLogic() {
 		return (UserLogic) Main.getBean("userLogic");
+	}
+
+	/**
+	 * 跨域请求发送options请求时候进行处理
+	 *
+	 * @param requestMethods
+	 * @param requestHeaders
+	 * @return
+	 * @throws Exception
+	 */
+	@OPTIONS
+	@Path("/{path:.*}")
+	public Response handleCORSRequest(@HeaderParam("Access-Control-Request-Method") final String requestMethods,
+			@HeaderParam("Access-Control-Request-Headers") final String requestHeaders) throws Exception {
+		Response.ResponseBuilder builder = Response.ok();
+		if (requestHeaders != null)
+			builder.header("Access-Control-Allow-Headers", requestHeaders);
+		if (requestMethods != null)
+			builder.header("Access-Control-Allow-Methods", requestMethods);
+		return builder.build();
 	}
 
 	/**
