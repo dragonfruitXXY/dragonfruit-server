@@ -75,10 +75,10 @@ public class StoryService {
 	 *
 	 * <pre>
 	 *     请求数据格式:{"storyTypeId":"", "name":"", ""description:""}
-	 *     需要在Cookie中设置tocken
+	 *     需要在Cookie中设置token
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @param json
 	 * @return
 	 */
@@ -86,8 +86,8 @@ public class StoryService {
 	@Path("/save")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Object> saveStory(@CookieParam("tocken") String tocken, String json) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+	public Map<String, Object> saveStory(@CookieParam("token") String token, String json) throws Exception {
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		Story story = (Story) JsonUtils.JsonToObj(json, Story.class);
@@ -105,10 +105,10 @@ public class StoryService {
 	 * 删除故事
 	 *
 	 * <pre>
-	 *     需要在Cookie中设置tocken
+	 *     需要在Cookie中设置token
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @param storyId
 	 * @return
 	 */
@@ -116,9 +116,9 @@ public class StoryService {
 	@Path("/{storyId}/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean deleteStory(@CookieParam("tocken") String tocken, @PathParam("storyId") String storyId)
+	public boolean deleteStory(@CookieParam("token") String token, @PathParam("storyId") String storyId)
 			throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		if (storyId == null || storyId.equals(""))
@@ -136,10 +136,10 @@ public class StoryService {
 	 *
 	 * <pre>
 	 *     请求数据格式:{"storyId":"", "headContentId":"", "content":""}
-	 *     需要在Cookie中设置tocken
+	 *     需要在Cookie中设置token
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @param json
 	 * @return
 	 */
@@ -147,8 +147,8 @@ public class StoryService {
 	@Path("/content/save")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Map<String, Object> saveStoryContent(@CookieParam("tocken") String tocken, String json) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+	public Map<String, Object> saveStoryContent(@CookieParam("token") String token, String json) throws Exception {
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		StoryContent storyContent = (StoryContent) JsonUtils.JsonToObj(json, StoryContent.class);
@@ -166,10 +166,10 @@ public class StoryService {
 	 * 删除故事内容
 	 *
 	 * <pre>
-	 *     需要在Cookie中设置tocken
+	 *     需要在Cookie中设置token
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @param storyContentId
 	 * @return
 	 */
@@ -177,9 +177,9 @@ public class StoryService {
 	@Path("/content/{storyContentId}/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean deleteStoryContent(@CookieParam("tocken") String tocken,
+	public boolean deleteStoryContent(@CookieParam("token") String token,
 			@PathParam("storyContentId") String storyContentId) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		if (storyContentId == null || storyContentId.equals(""))
@@ -196,10 +196,10 @@ public class StoryService {
 	 * 点赞故事
 	 *
 	 * <pre>
-	 *     需要在Cookie中设置tocken
+	 *     需要在Cookie中设置token
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @param storyId
 	 * @return
 	 */
@@ -207,9 +207,9 @@ public class StoryService {
 	@Path("/{storyId}/like")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean likeStory(@CookieParam("tocken") String tocken, @PathParam("storyId") String storyId)
+	public boolean likeStory(@CookieParam("token") String token, @PathParam("storyId") String storyId)
 			throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		if (storyId == null || storyId.equals(""))
@@ -221,10 +221,10 @@ public class StoryService {
 	 * 点赞故事内容
 	 *
 	 * <pre>
-	 *     需要在Cookie中设置tocken
+	 *     需要在Cookie中设置token
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @param storyContentId
 	 * @return
 	 */
@@ -232,9 +232,9 @@ public class StoryService {
 	@Path("/content/{storyContentId}/like")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean likeStoryContent(@CookieParam("tocken") String tocken,
+	public boolean likeStoryContent(@CookieParam("token") String token,
 			@PathParam("storyContentId") String storyContentId) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		if (storyContentId == null || storyContentId.equals(""))
@@ -279,15 +279,15 @@ public class StoryService {
 	/**
 	 * 获取用户建立的所有故事
 	 * 
-	 * @param tocken
+	 * @param token
 	 * @return
 	 */
 	@GET
 	@Path("/getStories")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<StoryVO> getUserStories(@CookieParam("tocken") String tocken) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+	public List<StoryVO> getUserStories(@CookieParam("token") String token) throws Exception {
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		List<Story> storyList = getStoryLogic().getByUserId(userId);

@@ -12,53 +12,53 @@ import dragonfruit.server.util.RandomUtils;
  */
 public class UserBindCache {
 	/**
-	 * 用户登录状态缓存池，绑定之后生成随机字串用作tocken返回给客户端并存入该缓存池，用以之后接口进行比对等等
+	 * 用户登录状态缓存池，绑定之后生成随机字串用作token返回给客户端并存入该缓存池，用以之后接口进行比对等等
 	 * 
 	 * <pre>
 	 * 	缓存池结构：
 	 * 	[
-	 * 		{"tocken":"userId"},
-	 * 		{"tocken":"userId"}
+	 * 		{"token":"userId"},
+	 * 		{"token":"userId"}
 	 * 	]
 	 * </pre>
 	 */
-	public static Map<String, String> userTockenBindPool = new HashMap<>();
+	public static Map<String, String> userTokenBindPool = new HashMap<>();
 
 	/**
-	 * 向缓存池添加登录用户,若已绑定，则直接返回tocken
+	 * 向缓存池添加登录用户,若已绑定，则直接返回token
 	 * 
 	 * @param userId
-	 * @return tocken
+	 * @return token
 	 */
 	public static String addBoundUser(String userId) {
-		String tocken;
+		String token;
 		if (!isUserBound(userId)) {
-			tocken = RandomUtils.getRandomString(20);
-			userTockenBindPool.put(tocken, userId);
+			token = RandomUtils.getRandomString(20);
+			userTokenBindPool.put(token, userId);
 		} else {
-			tocken = getBoundUserTocken(userId);
+			token = getBoundUserToken(userId);
 		}
-		return tocken;
+		return token;
 	}
 
 	/**
-	 * 获取tocken对应的userId
+	 * 获取token对应的userId
 	 * 
-	 * @param tocken
+	 * @param token
 	 * @return
 	 */
-	public static String getBoundUser(String tocken) {
-		return userTockenBindPool.get(tocken);
+	public static String getBoundUser(String token) {
+		return userTokenBindPool.get(token);
 	}
 
 	/**
-	 * 用户的tocken是否存在
+	 * 用户的token是否存在
 	 *
-	 * @param tocken
+	 * @param token
 	 * @return
 	 */
-	public static boolean isTockenExist(String tocken) {
-		if (userTockenBindPool.containsKey(tocken))
+	public static boolean isTokenExist(String token) {
+		if (userTokenBindPool.containsKey(token))
 			return true;
 		return false;
 	}
@@ -66,11 +66,11 @@ public class UserBindCache {
 	/**
 	 * 删除登录用户信息，即登出
 	 * 
-	 * @param tocken
+	 * @param token
 	 */
-	public static void removeBoundUserTocken(String tocken) {
-		if (userTockenBindPool.containsKey(tocken))
-			userTockenBindPool.remove(tocken);
+	public static void removeBoundUserToken(String token) {
+		if (userTokenBindPool.containsKey(token))
+			userTokenBindPool.remove(token);
 	}
 
 	/**
@@ -80,7 +80,7 @@ public class UserBindCache {
 	 * @return
 	 */
 	private static boolean isUserBound(String userId) {
-		for (String id : userTockenBindPool.values()) {
+		for (String id : userTokenBindPool.values()) {
 			if (id.equals(userId)) {
 				return true;
 			}
@@ -89,14 +89,14 @@ public class UserBindCache {
 	}
 
 	/**
-	 * 已登录的用户获取缓存池中的tocken(用value获取key)
+	 * 已登录的用户获取缓存池中的token(用value获取key)
 	 * 
 	 * @param userId
 	 * @return
 	 */
-	private static String getBoundUserTocken(String userId) {
-		for (String key : userTockenBindPool.keySet()) {
-			if (userTockenBindPool.get(key).equals(userId)) {
+	private static String getBoundUserToken(String userId) {
+		for (String key : userTokenBindPool.keySet()) {
+			if (userTokenBindPool.get(key).equals(userId)) {
 				return key;
 			}
 		}

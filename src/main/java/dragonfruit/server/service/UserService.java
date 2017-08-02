@@ -139,7 +139,7 @@ public class UserService {
 	 * <pre>
 	 *     请求格式:/user/register/{userName}/verify?verificationCode=
 	 *
-	 *     返回参数：如果验证成功返回用户id和tocken
+	 *     返回参数：如果验证成功返回用户id和token
 	 *
 	 * </pre>
 	 *
@@ -160,10 +160,10 @@ public class UserService {
 		String userId;
 		userId = getUserLogic().registerVerify(userName, verificationCode);
 		if (userId != null) {//验证成功
-			String tocken = UserBindCache.addBoundUser(userId);
+			String token = UserBindCache.addBoundUser(userId);
 			Map<String, String> data = new HashMap<>();
 			data.put("userId", userId);
-			data.put("tocken", tocken);
+			data.put("token", token);
 			return I18nUtils.getMessage(I18nContext.getLanguage(), I18nConstances.USER_VERIFY_SUCCESS_HTML_STRING, userName);
 		} else {
 			return I18nUtils.getMessage(I18nContext.getLanguage(), I18nConstances.USER_VERIFY_FAIL_HTML_STRING);
@@ -176,9 +176,9 @@ public class UserService {
 	 * <pre>
 	 *     请求格式:{"userName":"", "verificationCode":""}
 	 *
-	 *     返回参数：如果验证成功返回用户id和tocken
+	 *     返回参数：如果验证成功返回用户id和token
 	 *
-	 * 		之后的请求需要在cookie中设置tocken
+	 * 		之后的请求需要在cookie中设置token
 	 * </pre>
 	 *
 	 * @param json
@@ -198,10 +198,10 @@ public class UserService {
 		String userId;
 		userId = getUserLogic().registerVerify(userName, verificationCode);
 		if (userId != null) {
-			String tocken = UserBindCache.addBoundUser(userId);
+			String token = UserBindCache.addBoundUser(userId);
 			Map<String, String> data = new HashMap<>();
 			data.put("userId", userId);
-			data.put("tocken", tocken);
+			data.put("token", token);
 			return data;
 		} else {
 			throw new DragonfruitException(I18nConstances.USER_REGISTER_VERIFY_FAILED);
@@ -215,7 +215,7 @@ public class UserService {
 	 * 	请求格式:{"name":"", "password":"", "phoneNum":"", "email":"", "signature":"", "nickName":""}
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @param json
 	 * @return
 	 */
@@ -223,8 +223,8 @@ public class UserService {
 	@Path("/update")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean updateUser(@CookieParam("tocken") String tocken, String json) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+	public boolean updateUser(@CookieParam("token") String token, String json) throws Exception {
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		User user = (User) JsonUtils.JsonToObj(json, User.class);
@@ -239,7 +239,7 @@ public class UserService {
 	 * 	请求参数：
 	 *    {"name":"", "password":""}
 	 *
-	 * 	之后的请求需要在cookie中设置tocken
+	 * 	之后的请求需要在cookie中设置token
 	 * </pre>
 	 *
 	 * @param json
@@ -260,10 +260,10 @@ public class UserService {
 		if (!user.getPassword().equals(userPwd))
 			throw new DragonfruitException(I18nConstances.USER_LOGIN_FAILED, userName);
 		String userId = user.getId();
-		String tocken = UserBindCache.addBoundUser(userId);
+		String token = UserBindCache.addBoundUser(userId);
 		Map<String, String> data = new HashMap<>();
 		data.put("userId", userId);
-		data.put("tocken", tocken);
+		data.put("token", token);
 		return data;
 	}
 
@@ -271,20 +271,20 @@ public class UserService {
 	 * 用户登出
 	 * <p>
 	 * <pre>
-	 * 需要在Cookie中设置tocken
+	 * 需要在Cookie中设置token
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @return
 	 */
 	@GET
 	@Path("/logout")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean unbindUser(@CookieParam("tocken") String tocken) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+	public boolean unbindUser(@CookieParam("token") String token) throws Exception {
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId != null) {
-			UserBindCache.removeBoundUserTocken(tocken);
+			UserBindCache.removeBoundUserToken(token);
 			return true;
 		} else {
 			return false;
@@ -294,17 +294,17 @@ public class UserService {
 	/**
 	 * 注销(删除)用户
 	 *
-	 * @param tocken
+	 * @param token
 	 * @return
 	 */
 	@GET
 	@Path("/delete")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean deleteUser(@CookieParam("tocken") String tocken) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+	public boolean deleteUser(@CookieParam("token") String token) throws Exception {
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId != null) {
-			UserBindCache.removeBoundUserTocken(tocken);
+			UserBindCache.removeBoundUserToken(token);
 			getUserLogic().deleteById(userId);
 			return true;
 		} else {
@@ -316,18 +316,18 @@ public class UserService {
 	 * 获取用户详情
 	 * <p>
 	 * <pre>
-	 * 需要在Cookie中设置tocken
+	 * 需要在Cookie中设置token
 	 * </pre>
 	 *
-	 * @param tocken
+	 * @param token
 	 * @return
 	 */
 	@GET
 	@Path("/info")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public UserVO getUserInfo(@CookieParam("tocken") String tocken) throws Exception {
-		String userId = UserBindCache.getBoundUser(tocken);
+	public UserVO getUserInfo(@CookieParam("token") String token) throws Exception {
+		String userId = UserBindCache.getBoundUser(token);
 		if (userId == null)
 			throw new DragonfruitException(I18nConstances.USER_NOT_LOGIN);
 		User user = getUserLogic().getById(userId);
