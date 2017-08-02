@@ -1,191 +1,5 @@
 1.
 接口说明:
-	查询用户名是否已经存在
-接口方法:
-	GET
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/{userName}/exists
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-请求参数格式:
-	无
-返回参数格式:
-	{
-	    "exist": false
-	}
-备注:
-	exist:true 存在 / false 不存在
-
-
-2.
-接口说明:
-	用户注册（未验证）
-接口方法:
-	POST
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/register
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-请求参数格式:
-	{"name":"", "password":"", "phoneNum":"", "email":"", "signature":"", "nickName":""}
-返回参数格式:
-	true/false
-备注:
-	用户注册信息存入缓存，待验证成功后存库
-
-3.
-接口说明:
-	用户重新验证,重新发送验证码（切换验证码、切换email或phoneNumber）
-接口方法:
-	POST
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/register/changeVerificationCode
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-请求参数格式:
-	{"userName":"", "email":"", "phoneNumber":""}
-返回参数格式:
-	true/false
-备注:
-	userName为必需，且需要在存在在缓存中（注册过，未验证成功）
-	email/phoneNumber可为空，为空代表不修改验证邮箱或电话
-
-4.
-接口说明:
-	用户注册验证(GET), 邮箱点击，返回HTML页面
-接口方法:
-	GET
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/register/{userName}/verify?verificationCode=
-请求参数格式:
-	无
-返回参数格式:
-	html页面
-	如：
-	
-	你好, XXX !你已验证注册成功。请重新登录。
-备注:
-	验证成功后用户信息存库
-
-
-5.
-接口说明:
-	用户注册验证(POST)
-接口方法:
-	POST
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/register/verify
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-请求参数格式:
-	{"userName":"", "verificationCode":""}
-返回参数格式:
-	{
-	    "tocken": "ozhfvi3rijokzuh09r5w",
-	    "userId": "5966d191be023fda14c74142"
-	}
-备注:
-	验证成功后用户信息存库
-	
-	
-6.
-接口说明:
-	修改用户信息
-接口方法:
-	POST
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/update
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
-请求参数格式:
-	{"name":"", "password":"", "phoneNum":"", "email":"", "signature":"", "nickName":""}
-返回参数格式:
-	true/false
-备注:
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
-	
-	
-7.
-接口说明:
-	用户登录
-接口方法:
-	POST
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/login
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-请求参数格式:
-	{"name":"", "password":""}
-返回参数格式:
-	{
-	    "tocken": "b0plvjhzuj3yqex5jcry",
-	    "userId": "5966d010be023fda14c74140"
-	}
-备注:
-	返回参数中的tocken添加到请求Cookie中，用来给后台识别用户。
-
-8.
-接口说明:
-	用户登出
-接口方法:
-	GET
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/logout
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
-请求参数格式:
-	无
-返回参数格式:
-	true/false
-备注:
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
-
-9.
-接口说明:
-	注销(删除)用户
-接口方法:
-	GET
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/delete
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
-请求参数格式:
-	无
-返回参数格式:
-	true/false
-备注:
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
-	
-10.
-接口说明:
-	获取用户详情
-接口方法:
-	GET
-接口URL:
-	http://127.0.0.1:9690/dragonfruit/rest/v1/user/info
-请求头:
-	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
-请求参数格式:
-	无
-返回参数格式:
-	{
-	    "id": "595f82e76318b4e55c14e5c5",
-	    "name": "xuyihao",
-	    "password": "12345678",
-	    "phoneNum": "15700083767",
-	    "email": "841846248@qq.com",
-	    "signature": "Hi!",
-	    "nickName": "johnson"
-	}
-备注:
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
-	
-11.
-接口说明:
 	新建故事
 接口方法:
 	POST
@@ -193,7 +7,7 @@
 	http://127.0.0.1:9690/dragonfruit/rest/v1/story/save
 请求头:
 	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
+	Cookie: token=ozhfvi3rijokzuh09r5w
 请求参数格式:
 	{"storyTypeId":"", "name":"", "description":""}
 返回参数格式:
@@ -205,9 +19,9 @@
 	storyTypeId:故事类型id
 	name:故事名称
 	description:故事描述
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
+	需要将token添加到请求Cookie中，用来给后台识别用户。
 	
-12.
+2.
 接口说明:
 	删除故事
 接口方法:
@@ -216,16 +30,16 @@
 	http://127.0.0.1:9690/dragonfruit/rest/v1/story/591a93e70f083c30f89eed5a/delete
 请求头:
 	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
+	Cookie: token=ozhfvi3rijokzuh09r5w
 请求参数格式:
 	无
 返回参数格式:
 	true/false
 备注:
 	删除故事会将所有与此故事关联的故事内容删除
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
+	需要将token添加到请求Cookie中，用来给后台识别用户。
 	
-13.
+3.
 接口说明:
 	新建内容
 接口方法:
@@ -234,7 +48,7 @@
 	http://127.0.0.1:9690/dragonfruit/rest/v1/story/content/save
 请求头:
 	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
+	Cookie: token=ozhfvi3rijokzuh09r5w
 请求参数格式:
 	{"storyId":"", "headContentId":null, "content":""}
 返回参数格式:
@@ -243,9 +57,9 @@
 	}
 备注:
 	headContentId为null表示为头内容结点,每个故事只能有一个头内容结点
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
+	需要将token添加到请求Cookie中，用来给后台识别用户。
 	
-14.
+4.
 接口说明:
 	删除故事内容
 接口方法:
@@ -254,15 +68,15 @@
 	http://127.0.0.1:9690/dragonfruit/rest/v1/story/content/{storyContentId}/delete
 请求头:
 	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
+	Cookie: token=ozhfvi3rijokzuh09r5w
 请求参数格式:
 	无
 返回参数格式:
 	true/false
 备注:
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
+	需要将token添加到请求Cookie中，用来给后台识别用户。
 	
-15.
+5.
 接口说明:
 	点赞故事
 接口方法:
@@ -271,15 +85,15 @@
 	http://127.0.0.1:9690/dragonfruit/rest/v1/story/{storyId}/like
 请求头:
 	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
+	Cookie: token=ozhfvi3rijokzuh09r5w
 请求参数格式:
 	无
 返回参数格式:
 	true/false
 备注:
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
+	需要将token添加到请求Cookie中，用来给后台识别用户。
 	
-16.
+6.
 接口说明:
 	点赞故事内容
 接口方法:
@@ -288,15 +102,15 @@
 	http://127.0.0.1:9690/dragonfruit/rest/v1/story/content/{storyContentId}/like
 请求头:
 	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
+	Cookie: token=ozhfvi3rijokzuh09r5w
 请求参数格式:
 	无
 返回参数格式:
 	true/false
 备注:
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。
+	需要将token添加到请求Cookie中，用来给后台识别用户。
 
-17.
+7.
 接口说明:
 	获取所有故事类型
 接口方法:
@@ -338,7 +152,7 @@
 备注:
 	
 	
-18.
+8.
 接口说明:
 	获取故事总数
 接口方法:
@@ -356,7 +170,7 @@
 备注:
 	
 	
-19.
+9.
 接口说明:
 	分页获取故事
 接口方法:
@@ -397,7 +211,7 @@
 备注:
 	请求参数说明:page：当前页  size:页大小
 	
-20.
+10.
 接口说明:
 	分页获取故事(根据点赞数量降序排序)
 接口方法:
@@ -438,7 +252,7 @@
 备注:
 	请求参数说明:page：当前页  size:页大小
 	
-21.
+11.
 接口说明:
 	获取故事详情
 接口方法:
@@ -461,7 +275,7 @@
 备注:
 	
 	
-22.
+12.
 接口说明:
 	获取故事内容详情
 接口方法:
@@ -484,7 +298,7 @@
 备注:
 	
 	
-23.
+13.
 接口说明:
 	获取故事内容树状结构
 接口方法:
@@ -584,7 +398,7 @@
 备注:
 
 
-24.
+14.
 接口说明:
 	获取用户建立的所有故事
 接口方法:
@@ -593,7 +407,7 @@
 	http://127.0.0.1:9690/dragonfruit/rest/v1/story/getStories
 请求头:
 	Cookie: language=zh_CN (目前支持zh_CN简体中文, en_US美国英语)
-	Cookie: tocken=ozhfvi3rijokzuh09r5w
+	Cookie: token=ozhfvi3rijokzuh09r5w
 请求参数格式:
 	无
 返回参数格式:
@@ -616,4 +430,3 @@
 	    }
 	]
 备注:
-	需要将tocken添加到请求Cookie中，用来给后台识别用户。	

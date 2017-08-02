@@ -1,7 +1,7 @@
 # dragonfruit-server
 火龙果-服务端
 
-##Base Architecture
+## Base Architecture
 Java restful web service
 
 1.Database:	mongodb
@@ -16,7 +16,7 @@ Java restful web service
 
 6.log framework: slf4j + logback
 
-##Required Environments
+## Required Environments
 
 1.Mongodb service
 
@@ -24,7 +24,7 @@ Java restful web service
 
 3.maven building tool
 
-##How To USE
+## How To USE
 
 1.Clone the code into your computer.
 
