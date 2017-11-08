@@ -45,4 +45,9 @@ public class LikeStoryContent {
 	public void setStoryContentId(String storyContentId) {
 		this.storyContentId = storyContentId;
 	}
+
+	@Override
+	public String toString() {
+		return "LikeStoryContent [id=" + id + ", userId=" + userId + ", storyContentId=" + storyContentId + "]";
+	}
 }

@@ -75,4 +75,10 @@ public class Story {
 	public void setLike(Long like) {
 		this.like = like;
 	}
+
+	@Override
+	public String toString() {
+		return "Story [id=" + id + ", userId=" + userId + ", storyTypeId=" + storyTypeId + ", name=" + name
+				+ ", description=" + description + ", like=" + like + "]";
+	}
 }

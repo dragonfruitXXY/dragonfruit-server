@@ -81,4 +81,10 @@ public class UserVO {
 	public void setNickName(String nickName) {
 		this.nickName = nickName;
 	}
+
+	@Override
+	public String toString() {
+		return "UserVO [id=" + id + ", name=" + name + ", password=" + password + ", phoneNum=" + phoneNum + ", email="
+				+ email + ", signature=" + signature + ", nickName=" + nickName + "]";
+	}
 }

@@ -91,4 +91,10 @@ public class StoryContentNodeVO {
 		if (childNodeList.contains(storyContentNodeVO))
 			childNodeList.remove(storyContentNodeVO);
 	}
+
+	@Override
+	public String toString() {
+		return "StoryContentNodeVO [id=" + id + ", userId=" + userId + ", storyId=" + storyId + ", headContentId="
+				+ headContentId + ", content=" + content + ", like=" + like + ", childNodeList=" + childNodeList + "]";
+	}
 }

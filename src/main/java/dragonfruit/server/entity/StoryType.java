@@ -63,4 +63,9 @@ public class StoryType {
 	public void setNameMap(Map<String, String> nameMap) {
 		this.nameMap = nameMap;
 	}
+
+	@Override
+	public String toString() {
+		return "StoryType [id=" + id + ", code=" + code + ", nameMap=" + nameMap + "]";
+	}
 }

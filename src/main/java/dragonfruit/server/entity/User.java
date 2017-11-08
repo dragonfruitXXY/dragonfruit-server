@@ -86,4 +86,10 @@ public class User {
 		this.nickName = nickName;
 	}
 
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", name=" + name + ", password=" + password + ", phoneNum=" + phoneNum + ", email="
+				+ email + ", signature=" + signature + ", nickName=" + nickName + "]";
+	}
+
 }

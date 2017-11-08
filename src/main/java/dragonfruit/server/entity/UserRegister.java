@@ -109,4 +109,11 @@ public class UserRegister {
 		setSubmitTime(DateUtils.currentDateTimeForDate());
 		return true;
 	}
+
+	@Override
+	public String toString() {
+		return "UserRegister [submitTime=" + submitTime + ", name=" + name + ", password=" + password + ", phoneNum="
+				+ phoneNum + ", email=" + email + ", signature=" + signature + ", nickName=" + nickName + ", verificationCode="
+				+ verificationCode + ", verified=" + verified + "]";
+	}
 }
