@@ -115,7 +115,10 @@ public class UserRegisterCache {
 	 */
 	@Scheduled(cron = "0 0/1 * * * *")
 	public void clearCache() {
-		for (String userName : userRegisterCache.keySet()) {
+		String[] userNameArray = new String[userRegisterCache.keySet().size()];
+		userNameArray = userRegisterCache.keySet().toArray(userNameArray);
+
+		for (String userName : userNameArray) {
 			UserRegister userRegister = userRegisterCache.get(userName);
 			//经过验证
 			if (userRegister.isVerified()) {

@@ -95,9 +95,9 @@ public class UserBindCache {
 	 * @return
 	 */
 	private static String getBoundUserToken(String userId) {
-		for (String key : userTokenBindPool.keySet()) {
-			if (userTokenBindPool.get(key).equals(userId)) {
-				return key;
+		for (Map.Entry<String, String> entry : userTokenBindPool.entrySet()) {
+			if (entry.getValue().equals(userId)) {
+				return entry.getKey();
 			}
 		}
 		return null;
