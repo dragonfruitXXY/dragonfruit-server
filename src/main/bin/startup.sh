@@ -1,1 +1,2 @@
-java -classpath "./lib/*:$CLASSPATH" dragonfruit.server.Main
+#!/bin/bash
+./dragonfruitserver.sh start
